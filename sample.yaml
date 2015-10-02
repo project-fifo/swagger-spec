@@ -45,7 +45,7 @@ paths:
         - $ref: '#/parameters/fulllistfieldsParam'
       responses:
         '200':
-          description: list of groupings
+          description: list of users
           schema:
             type: array
             items:
@@ -75,7 +75,7 @@ paths:
           schema:
             $ref: '#/definitions/user'
   '/users/{uuid}':
-    post:
+    put:
       summary: Changes the password of a user
       parameters:
         - name: uuid
@@ -92,6 +92,73 @@ paths:
               password:
                 description: new password to set
                 type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}':
+    delete:
+      summary: Deletes a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/user/{uuid}/permissions/{permission}':
+    get:
+      summary: |
+        Tests if a user has is allowed to perform an action. 
+        Please note that 403 here does not mean the user is not allowed 
+        but that the requesting token was not allowed to test for the client!
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to test as path i.e. 'some/funky/permission'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      summary: Grants a permission to a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to grant as path i.e. 'some/funky/permission'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Revokes a permission from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to revoke as path i.e. 'some/funky/permission'
+          required: true
+          type: string
       responses:
         '200':
           description: OK
