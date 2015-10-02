@@ -86,6 +86,12 @@ definitions:
         type: array
         items:
           type: string
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
 
 paths:
   '/users':
@@ -210,6 +216,214 @@ paths:
           in: path
           description: |
             the permission to revoke as path i.e. 'some/funky/permission'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/user/{uuid}/role/{role}':
+    put:
+      summary: Gives a user a role
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: role
+          in: path
+          description: UUID of the role to join
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Removes a role from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: role
+          in: path
+          description: UUID of the role to join
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/keys' :
+    put:
+      summary: Adds a SSH key to a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              keys:
+                description: key/value pair for the key
+                type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/keys/{key-id}' :
+    delete:
+      summary: Removes a SSH key from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: key-id
+          in: path
+          description: id if the key to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/yubikeys' :
+    put:
+      summary: Removes a SSH key from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              otp:
+                description: OTP from the YubiKey to add
+                type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/yubikeys/{key-id}' :
+    delete:
+      summary: Removes a SSH key from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: key-id
+          in: path
+          description: id if the key to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/orgs/{org}' :
+    put:
+      summary: |
+        Adds a user to an Organisation. The first joined Organisation 
+        will automatically be set as active. Any further Organisations 
+        need to be selected as active by passing the 'active' parameter 
+        in a JSON.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: org
+          in: path
+          description: UUID of the org to join
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: false
+          schema:
+            type: object
+            properties: 
+              active:
+                description: used to set an orga
+                type: Boolean
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: Removes user from an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: org
+          in: path
+          description: UUID of the org to join
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/users/{uuid}/tokens' :
+    post:
+      summary: |
+        Crates a API token for a user with a given scope, please keep in 
+        mind that the reply to this request is THE ONLY TIME the bearer 
+        token can be accessed!
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              comment:
+                description: A comment for the token
+                type: String
+        - name: body
+          in: body
+          required: false
+          schema:
+            type: object
+            properties: 
+              scopes:
+                description: A list of scopes for the token
+                type: Array of Strings
+      responses:
+        '200':
+          description: OK 
+          schema: 
+            $ref: '#/definitions/apikey'
+  '/users/{uuid}/tokens/{token-id}' :
+    delete:
+      summary: |
+        Revokes a token, this applies equally for access and refresh tokens
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: token-id
+          in: path
+          description: ID of the token to delete (not the token itself!)
           required: true
           type: string
       responses:
