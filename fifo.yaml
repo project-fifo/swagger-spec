@@ -1,0 +1,248 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  user:
+    properties:
+      keys:
+        type: object
+      metadata:
+        type: object
+      name:
+        type: string
+      org:
+        $ref: '#/definitions/uuid'
+      orgs:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      permissions:
+        type: array
+        items:
+          $ref: '#/definitions/permission'
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      tokens:
+        type: array
+        items:
+          $ref: '#/definitions/token'
+      uuid:
+        $ref: '#/definitions/uuid'
+      yubikeys:
+        type: array
+        items:
+          type: string
+  grouping:
+    properties:
+      config:
+        type: object
+      metadata:
+        type: object
+      elements:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      name:
+        type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+      type:
+        type: string
+        enum:
+          - stack
+          - cluster
+
+paths:
+  /users:
+    get:
+      tags:
+        - 'users'
+      summary: Lists all users visible to the user
+      description: |
+        See Get User for the fields available for full-list-fields.
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of groupings
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/user'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'users'
+      summary: Creates a new user
+      description: |
+        Creates a new user
+      responses:
+        303:
+          description: Redirect to new user
+  '/user/{uuid}':
+    get:
+      tags:
+        - 'users'
+      summary: read grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to get
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns a grouping
+          schema:
+            $ref: '#/definitions/user'
+  '/users/{uuid}':
+    post:
+      tags:
+        - 'users'
+      summary: Changes the password of a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user to modify
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                description: new password to set
+                type: string
+      responses:
+        '200':
+          description: OK
+  /groupings:
+    get:
+      tags:
+        - 'groupings'
+      summary: list groupings
+      description: |
+        Lists all `Groupings` visible to the user, either by uuid or objects.
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of groupings
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/grouping'
+                - type: string
+  '/groupings/{uuid}':
+    get:
+      tags:
+        - 'groupings'
+      summary: read grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to get
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns a grouping
+          schema:
+            $ref: '#/definitions/grouping'
+  '/groupings/{uuid}/elements/{to-add}':
+    put:
+      tags:
+        - 'groupings'
+      summary: add an element to the grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: to-add
+          in: path
+          description: uuid of the grouping to add
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'groupings'
+      summary: remove an vm from the grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: to-add
+          in: path
+          description: uuid of the grouping to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
