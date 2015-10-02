@@ -1,0 +1,117 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 0.6.2
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  grouping:
+    properties:
+      config:
+        type: object
+      metadata:
+        type: object
+      elements:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      name:
+        type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+      type:
+        type: string
+        enum:
+          - stack
+          - cluster
+paths:
+  /groupings:
+    get:
+      summary: list groupings
+      description: |
+        Lists all `Groupings` visible to the user, either by uuid or objects.
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of groupings
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/grouping'
+                - type: string
+  '/groupings/{uuid}':
+    get:
+      summary: read grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to get
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns a grouping
+          schema:
+            $ref: '#/definitions/grouping'
+  '/groupings/{uuid}/elements/{to-add}':
+    put:
+      summary: add an element to the grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: to-add
+          in: path
+          description: uuid of the grouping to add
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      summary: remove an vm from the grouping
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: to-add
+          in: path
+          description: uuid of the grouping to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+
