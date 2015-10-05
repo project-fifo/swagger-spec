@@ -120,7 +120,7 @@ paths:
       description: |
         Creates a new user
       responses:
-        303:
+        '303':
           description: Redirect to new user
 
   '/user/{uuid}':
@@ -136,7 +136,7 @@ paths:
           type: string
       responses:
         '200':
-          description: returns a grouping
+          description: returns a user
           schema:
             $ref: '#/definitions/user'
   '/users/{uuid}':
