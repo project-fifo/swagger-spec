@@ -100,25 +100,6 @@ definitions:
         type: array
         items:
           type: string
-  grouping:
-    properties:
-      config:
-        type: object
-      metadata:
-        type: object
-      elements:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      name:
-        type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-      type:
-        type: string
-        enum:
-          - stack
-          - cluster
   client:
     properties:
       client_id:
@@ -143,6 +124,37 @@ definitions:
         type: string
       uuid:
         $ref: '#/definitions/uuid'
+  role:
+    properties:
+      metadata:
+        type: object
+      name:
+        type: string
+      permissions: 
+        type: array
+        items:
+          $ref: '#/definitions/permission'
+      uuid:
+        $ref: '#/definitions/uuid'
+  grouping:
+    properties:
+      config:
+        type: object
+      metadata:
+        type: object
+      elements:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      name:
+        type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+      type:
+        type: string
+        enum:
+          - stack
+          - cluster
 
 ###################
 # Path definitions
@@ -788,6 +800,118 @@ paths:
           description: id of the URI to delete
           required: true
           type: integer
+      responses:
+        '200':
+          description: OK
+  #------------------
+  # Roles
+  #------------------
+  '/roles':
+    get:
+      tags:
+        - 'roles'
+      summary: Lists all roles visible to the user
+      description: |
+        See Get Roles for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of roles
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/role'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'roles'
+      summary: Creates a new role
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                description: Name of the role
+                type: string
+              secret:
+                description: the secret for the client
+                type: array
+                items:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to new client
+  '/roles/{uuid}':
+    get:
+      tags:
+        - 'roles'
+      summary: Reads a role
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the role
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns a role
+          schema:
+            $ref: '#/definitions/role'
+    delete:
+      tags:
+        - 'roles'
+      summary: Deletes a role
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the role
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/roles/{uuid}/permissions/{permission}':
+    put:
+      tags:
+        - 'roles'
+      summary: Grants a permission to a role.
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the role
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to grant as path i.e. 'some/funky/permission'
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'roles'
+      summary: Revokes a permission from a role
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the role
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to revoke as path i.e. 'some/funky/permission'
+          required: true
+          type: string
       responses:
         '200':
           description: OK
