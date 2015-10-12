@@ -1,0 +1,234 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  package:
+    properties:
+      metadata:
+        type: object
+      name:
+        type: string
+      compression:
+        type: string
+      cpu_cap:
+        type: integer
+      quota:
+        type: integer
+      ram:
+        type: integer
+      requirements:
+        type: array
+        items:
+          $ref: '#/definitions/pkg_reqs'
+      uuid:
+        $ref: '#/definitions/uuid'
+  pkg_reqs:
+    properties:
+      uuid:
+        $ref: '#/definitions/uuid'
+     #TODO: This is not defined
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
+
+paths:
+  '/packages':
+    get:
+      tags:
+        - 'packages'
+      summary: Lists all Packages visible to the user
+      description: |
+        See Get Package for the fields available for full-list-fields.
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of packages
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/packages'
+                - $ref: '#/definitions/uuid'
+  '/packages':
+    post:
+      tags:
+        - 'packages'
+      summary: |
+        Creates a new package
+        Requirements
+        'requirements' is an array of objects as with the following atributes:
+        'WEIGHT'
+        A number (positive or negative) or the string "most", "cant" for strong
+        enforcement or "scale" and "random" must, cant, and <number> rules
+        This rules simply compare an attribute of the hypervisor against a 
+        value and either enforces a the rule (must/cant) or gives out points, 
+        both positive and negative to rate the found hypervisors.
+        attribute
+        The attribute to check on the hypervisors, this can be a json like 
+        path so for example "characteristics.colour" will look up colour in 
+        the hypervisors characteristics
+        Value
+        The value to check against, this can be a number, a string, or an array.
+        condition
+        One of:
+        >=, > - Checks if the value of attribute is larger (or equal) to the 
+        value
+        =<, < - Checks if the value of attribute is smaller (or equal) to the 
+        value
+        =:= - Checks if the value of attribute is equal to the value
+        =/= - Checks if the value of attribute is not equal to the value
+        "subset" - Checks if the value of attribute is a subset of value 
+        (requires value to be an array)
+        "superset" - Checks if the value of attribute is a subset of value 
+        (requires value to be an array)
+        "disjoint" - Checks if the value of attribute is a subset of value 
+        (requires value to be an array)
+        "element" - Checks if the value of attribute is a subset of value 
+        (requires value to be an array)
+        "allowed" - Checks if the value of attribute is a subset of value 
+        (requires value to be an array)
+        scale rules
+        This rules linearly map an attributes value onto a given scale and 
+        give the result as points for hypervisor selection.
+        attribute
+        The attribute to check on the hypervisors, this can be a json like 
+        path so for example "characteristics.cores" will look up cores in the 
+        hypervisors characteristics This must be an numeric value towork
+        low, and high
+        The lowest and highest number of the scale, to map against.
+        random ruleS
+        This rules simply generate a random number on a given scale, this 
+        allows making non deterministic rules. The resulting number is used 
+        as points for hypervisor selection.
+        low, and high
+        The lowest and highest number the random number is generated from.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              name: 
+                description: Name of the package
+                type: string
+              quota:
+                description: |
+                  'GB' of quota to give the package, for KVM this applies as 
+                  secondary disk
+                type: integer
+              ram:
+                description: MB of memory for the
+                type: integer
+              cpu_cap:
+                description: '% of CPU cores to give the zone'
+                type: integer
+              cpu_shares:
+                description: |
+                  Shares of CPU time when two zones compete. (Defaults to 
+                  % of memory)
+                type: string
+              zfs_io_priority:
+                description: |
+                  ZFS Priority if zones are competing. (Defaults to % of 
+                  memory)
+                type: integer
+              blicksize:
+                description: Block size for KVM
+                type: integer
+              compression:
+                description: Compression used for the ZFS volume
+                type: string
+              requirements:
+                description: A list of rules to create
+                type: object
+      responses:
+        '200':
+          description: ok
+  '/packages/{uuid}':
+    get:
+      tags:
+        - 'packages'
+      summary: Reads a Package
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the package
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/package'
+  '/packages/{uuid}':
+    delete:
+      tags:
+        - 'packages'
+      summary: Deletes a Package
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the package
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK

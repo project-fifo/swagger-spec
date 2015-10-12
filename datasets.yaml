@@ -1,0 +1,258 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  dataset:
+    properties:
+      metadata:
+        type: object
+      description:
+        type: string
+      image_size:
+        type: integer
+      imported:
+        type: integer
+      name:
+        type: string
+      networks:
+        type: array
+        items:
+          $ref: '#/definitions/network'
+      os:
+        type: string
+      requirements:
+        type: array
+        items:
+          $ref: '#/definitions/dataset_reqs'
+      status:
+        type: string
+      type:
+        type: string
+      version:
+        type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+  dataset_reqs:
+    properties:
+      attribute:
+        type: string
+      condition:
+        type: string
+      value:
+        type: string
+      weight:
+        type: string
+
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
+
+paths:
+  '/datasets':
+    get:
+      tags:
+        - 'datasets'
+      summary: Lists all Datasets visible to the user
+      description: |
+        See Get Dataset for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of datasets
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/dataset'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'datasets'
+      summary: Imports a dataset form a imgapi compatible server
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              url:
+                description: url of the manifest to import
+                type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}':
+    get:
+      tags:
+        - 'datasets'
+      summary: Reads a Dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/dataset'
+    delete:
+      tags:
+        - 'datasets'
+      summary: Reads a Dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - 'datasets'
+      summary: |
+        Uploads a manifest as 1st step of a dataset import from a local file
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}/dataset.gz':
+    get:
+      tags:
+        - 'datasets'
+      summary: Downloads a zVol
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - 'datasets'
+      summary: |
+        Uploads a zvol as 2nd step of a dataset import from a local file
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}/networks/{nic}':
+    put:
+      tags:
+        - 'datasets'
+      summary: Adds or modifies a nic on the dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+        - name: nic
+          in: path
+          description: name of the nic to add (i.e. 'net1')
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              description:
+                description: description of the interface
+                type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'datasets'
+      summary: Adds or modifies a nic on the dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+        - name: nic
+          in: path
+          description: name of the nic to add (i.e. 'net1')
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK

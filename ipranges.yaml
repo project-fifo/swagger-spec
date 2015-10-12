@@ -1,0 +1,193 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  iprange:
+    properties:
+      metadata:
+        type: object
+      name:
+        type: string
+      gateway:
+        type: string
+      netmask:
+        type: string
+      network:
+        type: string
+      tag:
+        type: string
+      free:
+        type: array
+        items:
+          type: string
+      used:
+        type: array
+        items:
+          type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
+
+paths:
+  '/ipranges':
+    get:
+      tags:
+        - 'ipranges'
+      summary: Lists all IP Ranges visible to the user
+      description: |
+        See Get IP Range for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of ipranges
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/iprange'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'ipranges'
+      summary: Creates a new ip range
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                description: name of the  ip range
+                type: string
+              tag:
+                description: NIC Tag for the IP Range to use
+                type: string
+              subnet: 
+                description: The network address of the subnet
+                type: string
+              netmask:
+                description: The netmask of the subnet
+                type: string
+              gateway:
+                description: The gateway of the subnet
+                type: string
+              first:
+                description: First address to hand out (must be part of subnet!)
+                type: string
+              last:
+                description: Last address to hand out (must be part of subnet!)
+                type: string
+              vlan: 
+                description: VLan to tag the nics with
+                type: integer
+      responses:
+        '303':
+          description: Redirect to new org
+  '/ipranges/{uuid}':
+    get:
+      tags:
+        - 'ipranges'
+      summary: Reads a IP Range
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the ip range
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/iprange'
+    put:
+      tags:
+        - 'ipranges'
+      summary: Claims an IP Address from the range
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the ip range
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/ipranges/{uuid}/{ip}':
+    put:
+      tags:
+        - 'ipranges'
+      summary: Releases an IP
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the ip range
+          required: true
+          type: string
+        - name: ip
+          in: path
+          description: IP Address to release
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
