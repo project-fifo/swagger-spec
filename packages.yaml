@@ -54,38 +54,31 @@ definitions:
       - type
       - scope
       - id
-  user:
+  package:
     properties:
-      keys:
-        type: object
       metadata:
         type: object
       name:
         type: string
-      org:
-        $ref: '#/definitions/uuid'
-      orgs:
+      compression:
+        type: string
+      cpu_cap:
+        type: integer
+      quota:
+        type: integer
+      ram:
+        type: integer
+      requirements:
         type: array
         items:
-          $ref: '#/definitions/uuid'
-      permissions:
-        type: array
-        items:
-          $ref: '#/definitions/permission'
-      roles:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      tokens:
-        type: array
-        items:
-          $ref: '#/definitions/token'
+          $ref: '#/definitions/pkg_reqs'
       uuid:
         $ref: '#/definitions/uuid'
-      yubikeys:
-        type: array
-        items:
-          type: string
+  pkg_reqs:
+    properties:
+      uuid:
+        $ref: '#/definitions/uuid'
+     #TODO: This is not defined
   apikey:
     properties:
       bearer: 
@@ -117,7 +110,7 @@ paths:
     post:
       tags:
         - 'packages'
-        summary: |
+      summary: |
         Creates a new package
         Requirements
         'requirements' is an array of objects as with the following atributes:
@@ -182,10 +175,10 @@ paths:
                   secondary disk
                 type: integer
               ram:
-                description: 'MB' of memory for the
+                description: MB of memory for the
                 type: integer
               cpu_cap:
-                description: '%' of CPU cores to give the zone
+                description: '% of CPU cores to give the zone'
                 type: integer
               cpu_shares:
                 description: |
@@ -223,6 +216,8 @@ paths:
       responses:
         '200':
           description: OK
+          schema:
+            $ref: '#/definitions/package'
   '/packages/{uuid}':
     delete:
       tags:
