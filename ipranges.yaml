@@ -56,36 +56,28 @@ definitions:
       - id
   iprange:
     properties:
-      keys:
-        type: object
       metadata:
         type: object
       name:
         type: string
-      org:
-        $ref: '#/definitions/uuid'
-      orgs:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      permissions:
-        type: array
-        items:
-          $ref: '#/definitions/permission'
-      roles:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      tokens:
-        type: array
-        items:
-          $ref: '#/definitions/token'
-      uuid:
-        $ref: '#/definitions/uuid'
-      yubikeys:
+      gateway:
+        type: string
+      netmask:
+        type: string
+      network:
+        type: string
+      tag:
+        type: string
+      free:
         type: array
         items:
           type: string
+      used:
+        type: array
+        items:
+          type: string
+      uuid:
+        $ref: '#/definitions/uuid'
   apikey:
     properties:
       bearer: 
@@ -166,7 +158,7 @@ paths:
         '200':
           description: OK
           schema:
-            - $ref: '#/definitions/iprange'
+            $ref: '#/definitions/iprange'
     put:
       tags:
         - 'ipranges'
