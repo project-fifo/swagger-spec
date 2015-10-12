@@ -1,0 +1,310 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  org:
+    properties:
+      metadata:
+        type: object
+      name:
+        type: string
+      triggers:
+        type: array
+        items:
+          type: string 
+      uuid:
+        $ref: '#/definitions/uuid'
+  cdr:
+    properties:
+      action:
+        type: string
+      metadata:
+        type: object
+      resource:
+        $ref: '#/definitions/uuid'
+      timestamp:
+        type: integer
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
+
+paths:
+  '/orgs':
+    get:
+      tags:
+        - 'orgs'
+      summary: Lists all organizations visible to the user.
+      description: |
+        See Get Org for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of orgs
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/org'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'orgs'
+      summary: the name of the organization
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                description: the name of the organization
+                type: string
+      responses:
+        '303':
+          description: Redirect to new organization
+  '/orgs/{uuid}':
+    get:
+      tags:
+        - 'orgs'
+      summary: Reads an org
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the org
+          required: true
+          type: string
+      responses:
+         '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/org'
+    delete:
+      tags:
+        - 'orgs'
+      summary: Deletes an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the org
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/orgs/{uuid}/accounting':
+    get:
+      tags:
+        - 'orgs'
+      summary: | 
+        This will grab accounting data for a period between start and end. 
+        The data presented will include all data points for every resource 
+        that existed in this timeframe not only those in the timeframe.
+        This allows reconstructing the entire situation during the time 
+        frame, including resources that were created before and destroyed 
+        after the period.
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the organization
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              start:
+                description: Timestamp of the start of the accounting period
+                type: integer
+              end:
+                description: Timestamp of the end of the accounting period
+                type: integer     
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/cdr'
+  '/orgs/{uuid}/triggers/user_create':
+    put:
+      tags:
+        - 'orgs'
+      summary: |
+        This trigger is executed when a new user is created from someone 
+        who belongs to an org
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the organization
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: |
+                  Action to be performed, one of 'join_role', 'join_org', 
+                  'role_grant' and 'user_grant'
+                type: string
+              target:
+                description: |
+                  For 'join_*' actions the role or org to be joined, for
+                  '*_grant' the role or user the permission to be granted to
+                type: string  
+              base:
+                description: |
+                  For '*_grant' triggers, the base of the permissions to 
+                  be granted
+                type: string 
+              permission:
+                description: The rest of the permission to be granted
+                type: array
+                items:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to org
+  '/orgs/{uuid}/triggers/dataset_create':
+    post:
+      tags:
+        - 'orgs'
+      summary: |
+        This trigger is executed when a new dataset is created from someone 
+        who belongs to this org
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the organization
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: |
+                  Action to be performed, one of 'join_role', 'join_org', 
+                  'role_grant' and 'user_grant'
+                type: string
+              target:
+                description: |
+                  For 'join_*' actions the role or org to be joined, for
+                  '*_grant' the role or user the permission to be granted to
+                type: string  
+              base:
+                description: |
+                  For '*_grant' triggers, the base of the permissions to 
+                  be granted
+                type: string 
+              permission:
+                description: The rest of the permission to be granted
+                type: array
+                items:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to org
+  '/orgs/{uuid}/triggers/vm_create':
+    put:
+      tags:
+        - 'orgs'
+      summary: |
+        This trigger is executed when a new VM is created by someone who 
+        belongs to this org
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the organization
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: |
+                  Action to be performed, one of 'join_role', 'join_org', 
+                  'role_grant' and 'user_grant'
+                type: string
+              target:
+                description: |
+                  For 'join_*' actions the role or org to be joined, for
+                  '*_grant' the role or user the permission to be granted to
+                type: string  
+              base:
+                description: |
+                  For '*_grant' triggers, the base of the permissions to 
+                  be granted
+                type: string 
+              permission:
+                description: The rest of the permission to be granted
+                type: array
+                items:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to org
+  '/orgs/{uuid}/triggers/{trigger-id}':
+    delete:
+      tags:
+        - 'orgs'
+      summary: Deletes a trigger from an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the org
+          required: true
+          type: string
+        - name: trigger-id
+          in: path
+          description: trigger to be deleted
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: OK
