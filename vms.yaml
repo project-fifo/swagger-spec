@@ -30,61 +30,10 @@ definitions:
   uuid:
     type: string
     pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-  permission:
-    type: array
-    items:
-      type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
-  client:
-    properties:
-      client_id:
-        type: string
-      metadata:
-        type: object
-      name:
-        type: string
-      redirect_uris: # TODO: THIS IS NOT CORRECT
-        type: array
-        items:
-          type: string 
-      permissions:
-        type: array
-        items:
-          $ref: '#/definitions/permission'
-      roles:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      type:
-        type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
+  vm:
+    type: object #TOTO
+  metrics:
+    type: object #TODO
 paths:
   '/vms':
     get:
@@ -103,12 +52,11 @@ paths:
             type: array
             items:
               allOf:
-                - $ref: '#/definitions/vms'
+                - $ref: '#/definitions/vm'
                 - $ref: '#/definitions/uuid'
-  '/vms':
     post:
       tags:
-        -'vms'
+        - 'vms'
       summary: |
         this request queues a new VM creation. Most of the keys in config 
         are self-explanatory the one noteworthy is networks however. it is 
@@ -136,7 +84,7 @@ paths:
   '/vms/{uuid}':
     get:
       tags:
-        -'vms'
+        - 'vms'
       summary: reads a vm
       parameters:
         - name: uuid
@@ -148,24 +96,7 @@ paths:
         '200':
           description: returns an vms
           schema:
-            $ref: '#/definitions/vms'
-  '/vms/{uuid}/metrics':
-    get:
-      tags:
-        -'vms'
-      summary: reads a vm
-      parameters:
-        - name: uuid
-          in: path
-          description: uuid of the vm
-          required: true
-          type: string
-      responses:
-        '200':
-          description: returns an vms
-          schema:
-            $ref: '#/definitions/vms'
-  '/vms/{uuid}':
+            $ref: '#/definitions/vm'
     delete:
       tags:
         - 'vms'
@@ -179,6 +110,22 @@ paths:
       responses:
         '200':
           description: ok
+  '/vms/{uuid}/metrics':
+    get:
+      tags:
+        - 'vms'
+      summary: reads a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns an vms
+          schema:
+            $ref: '#/definitions/vm'
   '/vms/dry_run':
     post:
       tags:
@@ -340,7 +287,7 @@ paths:
       responses:
         '303':
           description: Redirect to new org
-  '/vms/:uuid/nis/:mac':
+  '/vms/{uuid}/nics/{mac}':
     delete:
       tags:
         - 'vms'
@@ -353,16 +300,17 @@ paths:
           type: string
         - name: mac
           in: path
+          required: true
           description: mac address of the nic to remove
           type: string
       responses:
         '200':
           description: ok
-  '/vms/:uuid/fw_rules':
+  '/vms/{uuid}/fw_rules':
     post:
       tags:
         - 'vms'
-      summary: |
+      description: |
         Creates a firewall rule of the VM. One side is always the current VM 
         the other side can be defined in 'target'.
         TARGET
@@ -393,18 +341,17 @@ paths:
                 description: the action of the rule either 'block' or 'allow'
                 type: string
               direction:
-                description: |
-                  the direction of the rule, either 'inbound' or 'outbound'
+                description: the direction of the rule, either 'inbound' or 'outbound'
                 type: string
               target:
                 description: The other side of the rule
-                type: mixed
+                type: string #TODO: Verify
               protocol: 
-                description: |
-                  the protocol to match, either 'tcp', 'udp' or 'icmp'
+                description: the protocol to match, either 'tcp', 'udp' or 'icmp'
                 type: string
               filters:
                 description: the filter to narrow down the match
+                type: object
       responses:
         '303':
           description: Redirect to new org
@@ -412,7 +359,7 @@ paths:
     post:
       tags:
         - 'vms'
-      summary: |
+      description: |
         deletes a firewall rule for the VM uuid, the rule id can be found in 
         the 'rule_id' field of the rule
       parameters:
@@ -548,31 +495,18 @@ paths:
       responses:
         '303':
           description: Redirect to new org
-  '/vms/{uuid}/nis/{backup-id}':
-    delete:
-      tags:
-        - 'vms'
-      summary: | 
-        Deletes a Backup, this will also delete all files on LeoFS related
-        to this backup. This will also delete all children of this backup 
-        since the restore can no longer happen without the parent. However 
-        other backups who are not in the child path of this backup will not 
-        be affected, not even if they are newer.
-      parameters:
-        - name: uuid
-          in: path
-          description: uuid of the vm
-          required: true
-          type: string
-        - name: backup-id
-          in: path
-          description: uuid of the backup
-          required: true
-          type: string
-      responses:
-        '200':
-          description: ok
-  '/vms/:uuid/backups/{backup-id}':
+  '/vms/{uuid}/backups/{backup-id}':
+    parameters:
+      - name: uuid
+        in: path
+        description: uuid of the vm
+        required: true
+        type: string
+      - name: backup-id
+        in: path
+        description: uuid of the backup to restore
+        required: true
+        type: string
     put:
       tags:
         - 'vms'
@@ -582,16 +516,6 @@ paths:
         If the VM is 'in limbo' so not deployed to a hypervisor right now, it 
         is possible to select the hypervisor it is re-deployed to.
       parameters:
-        - name: uuid
-          in: path
-          description: uuid of the vm
-          required: true
-          type: string
-        - name: backup-id
-          in: path
-          description: uuid of the backup to restore
-          required: true
-          type: string
         - name: body
           in: body
           required: true
@@ -604,6 +528,18 @@ paths:
               hypervisor:
                 description: Restores a backup to a specifo
                 type: string
+      responses:
+        '200':
+          description: ok
+    delete:
+      tags:
+        - 'vms'
+      summary: | 
+        Deletes a Backup, this will also delete all files on LeoFS related
+        to this backup. This will also delete all children of this backup 
+        since the restore can no longer happen without the parent. However 
+        other backups who are not in the child path of this backup will not 
+        be affected, not even if they are newer.
       responses:
         '200':
           description: ok
@@ -635,10 +571,10 @@ paths:
       responses:
         '200':
           description: ok
-  '/hypervisors/{uuid}/metrics': #TODO should this be under hypervisors?
+  '/vms/{uuid}/metrics':
     get:
       tags:
-        - 'hypervisors'
+        - 'vms'
       summary: Reads a VM
       parameters:
         - name: uuid
@@ -648,9 +584,11 @@ paths:
           type: string
       responses:
         '200':
-          description: returns an hypervisor
+          description: returns metrics for the hypervisor
           schema:
-            $ref: '#/definitions/hypervisor'
+            $ref: '#/definitions/metrics'
+        '503':
+          description: No metric server.
   '/vms/{uuid}/hypervisor':
     delete:
       tags:
