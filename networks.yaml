@@ -1,0 +1,179 @@
+swagger: '2.0'
+basePath: /api/2
+consumes:
+  - applicaiton/json
+produces:
+  - applicaiton/json
+info:
+  version: 2.0.0
+  title: Project-FiFo
+parameters:
+  fulllistParam:
+    name: full-list
+    in: query
+    description: Enables or disables the return ov objects rather then uuids
+    required: false
+    allowEmptyValue: false
+    type: boolean
+    format: boolean
+  fulllistfieldsParam:
+    name: full-list-fields
+    in: query
+    description: Fields to be returnd when full-list is enabled
+    required: false
+    format: string
+    type: array
+    items:
+      type: string
+    collectionFormat: csv
+definitions:
+  uuid:
+    type: string
+    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  network:
+    properties:
+      metadata:
+        type: object
+      name:
+        type: string
+      ipranges:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      uuid:
+        $ref: '#/definitions/uuid'
+  apikey:
+    properties:
+      bearer: 
+        type: string
+      id:
+        $ref: '#/definitions/uuid'
+
+paths:  
+  '/networks':
+    get:
+      tags:
+        - 'networks'
+      summary: |
+        Lists all networks visible to the user. 
+      description: |
+        See 'Get Network' for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of networks
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/network'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'networks'
+      summary: Creates a new network
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                description: name of the network
+                type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/networks/{uuid}':
+    get:
+      tags:
+        - 'networks'
+      summary: reads a network
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the network
+          required: true
+          type: string
+      responses:
+        '200':
+          description: list of networks
+          schema:
+            $ref: '#/definitions/uuid'
+    delete:
+      tags:
+        - 'networks'
+      summary: deletes a network
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the network
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  '/networks/{uuid}/iprange/{iprange}':
+    put:
+      tags:
+        - 'networks'
+      summary: Adds an iprange to a network
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user to delete
+          required: true
+          type: string
+        - name: iprange
+          in: path
+          description: uuid of the iprange to add
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'networks'
+      summary: Removes an IP Range from an network
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user to delete
+          required: true
+          type: string
+        - name: iprange
+          in: path
+          description: uuid of the iprange to add
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
