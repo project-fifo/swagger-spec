@@ -42,6 +42,16 @@ definitions:
     type: array
     items:
       type: string
+  requirement:
+    properties:
+      attribute:
+        type: string
+      condition:
+        type: string
+      value:
+        type: string
+      weight:
+        type: string
   apikey:
     properties:
       bearer: 
@@ -155,7 +165,74 @@ definitions:
         enum:
           - stack
           - cluster
-
+  dataset:
+    properties:
+      metadata:
+        type: object
+      description:
+        type: string
+      image_size:
+        type: integer
+      imported:
+        type: integer
+      name:
+        type: string
+      networks:
+        type: array
+        items:
+          type: object
+      os:
+        type: string
+      requirements:
+        type: array
+        items:
+          $ref: '#/definitions/requirement'
+      status:
+        type: string
+      type:
+        type: string
+      version:
+        type: string
+      uuid:
+        $ref: '#/definitions/uuid'
+  hypervisor:
+    properties:
+      alias:
+        type: string
+      metadata:
+        type: object
+      characteristics:
+        type: object
+      etherstubs:
+        type: object
+      host:
+        type: string
+      networks:
+        type: array
+        items:
+          type: string
+      path:
+        type: array
+        items:
+          type: string
+      pools:
+        type: object
+      port:
+        type: integer
+      resources:
+        type: object
+      services:
+        type: object
+      sysinfo:
+        type: object
+      version:
+        type: string
+      virtualisation:
+        type: array
+        items:
+          type: string
+      uuid:
+        $ref: '#/definitions/uuid'        
 ###################
 # Path definitions
 ###################
@@ -790,7 +867,7 @@ paths:
   #------------------
   # Groupings
   #------------------
-  /groupings:
+  '/groupings':
     get:
       tags:
         - 'groupings'
@@ -915,3 +992,275 @@ paths:
       responses:
         '200':
           description: OK'
+  #------------------
+  # Datasets
+  #------------------
+  '/datasets':
+    get:
+      tags:
+        - 'datasets'
+      summary: Lists all Datasets visible to the user
+      description: |
+        See Get Dataset for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of datasets
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/dataset'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'datasets'
+      summary: Imports a dataset form a imgapi compatible server
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              url:
+                description: url of the manifest to import
+                type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}':
+    get:
+      tags:
+        - 'datasets'
+      summary: Reads a Dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/dataset'
+    delete:
+      tags:
+        - 'datasets'
+      summary: Reads a Dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - 'datasets'
+      summary: |
+        Uploads a manifest as 1st step of a dataset import from a local file
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}/dataset.gz':
+    get:
+      tags:
+        - 'datasets'
+      summary: Downloads a zVol
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the datasets
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+    put:
+      tags:
+        - 'datasets'
+      summary: |
+        Uploads a zvol as 2nd step of a dataset import from a local file
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/datasets/{uuid}/networks/{nic}':
+    put:
+      tags:
+        - 'datasets'
+      summary: Adds or modifies a nic on the dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+        - name: nic
+          in: path
+          description: name of the nic to add (i.e. 'net1')
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              description:
+                description: description of the interface
+                type: string
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'datasets'
+      summary: Adds or modifies a nic on the dataset
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the dataset to import
+          required: true
+          type: string
+        - name: nic
+          in: path
+          description: name of the nic to add (i.e. 'net1')
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+  #------------------
+  # Hypervisors
+  #------------------
+  '/hypervisors':
+    get:
+      tags:
+        - 'hypervisors'
+      summary: lists all hypervisors visible to the user
+      description: |
+        See 'get hypervisor' for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of hypervisors
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/hypervisor'
+                - $ref: '#/definitions/uuid'
+  '/hypervisors/{uuid}':
+    get:
+      tags:
+        - 'hypervisors'
+      summary: reads a hypervisor
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns an hypervisor
+          schema:
+            $ref: '#/definitions/hypervisor'
+    delete:
+      tags:
+        - 'hypervisors'
+      summary: |
+        deletes a hypervisor. every vm still residing on this hypervisor 
+        will either be put in 'limbo' when at least one full backup exists, 
+        or be deleted if not.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
+  '/hypervisors/{uuid}/characteristics/{path}':
+    put:
+      tags:
+        - 'hypervisors'
+      summary: |
+        sets a hypervisor characteristic, this can be later used on rules 
+        to match against.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: url path prefix of the characteristic
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
+    delete:
+      tags:
+        - 'hypervisors'
+      summary: removes a characteristic from a hypervisor
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: url path to characteristic to delete
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
+  '/hypervisors/{uuid}/config':
+    put:
+      tags:
+        - 'hypervisors'
+      summary: sets a configuration / alias of the hypervisor
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              alias:
+                description: new alias of the hypervisor
+                type: string
+      responses:
+        '200':
+          description: ok
