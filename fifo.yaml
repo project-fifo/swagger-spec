@@ -38,6 +38,8 @@ definitions:
   uuid:
     type: string
     pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+  metrics:
+    type: object #TODO
   permission:
     type: array
     items:
@@ -254,7 +256,9 @@ definitions:
         items:
           type: string
       uuid:
-        $ref: '#/definitions/uuid'        
+        $ref: '#/definitions/uuid'
+  vm:
+    type: object #TOTO
   iprange:
     properties:
       metadata:
@@ -1582,6 +1586,24 @@ paths:
       responses:
         '200':
           description: ok
+  '/hypervisors/{uuid}/metrics':
+    get:
+      tags:
+        - 'hypervisors'
+      summary: Reads a VM
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns metrics for the hypervisor
+          schema:
+            $ref: '#/definitions/metrics'
+        '503':
+          description: No metric server.
   #------------------
   # IPRanges
   #------------------
@@ -1942,3 +1964,574 @@ paths:
       responses:
         '200':
           description: OK
+  #------------------
+  # VMs
+  #------------------
+  '/vms':
+    get:
+      tags:
+        - 'vms'
+      summary: lists all vms visible to the user
+      description: |
+        see get vm for the fields available for 'full-list-fields'
+      parameters:
+        - $ref: '#/parameters/fulllistParam'
+        - $ref: '#/parameters/fulllistfieldsParam'
+      responses:
+        '200':
+          description: list of vms
+          schema:
+            type: array
+            items:
+              allOf:
+                - $ref: '#/definitions/vm'
+                - $ref: '#/definitions/uuid'
+    post:
+      tags:
+        - 'vms'
+      summary: |
+        this request queues a new VM creation. Most of the keys in config 
+        are self-explanatory the one noteworthy is networks however. it is 
+        a map of nics (provided by the dataset) to UUIDs of networks (
+        not ip ranges!).
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              package:
+                description: uuid of the package to use for the vm
+                type: string
+              dataset:
+                description: uuid of the dataset to use for the vm
+                type: string  
+              config:
+                description: object with additional 
+                type: object 
+      responses:
+        '303':
+          description: redirect to new org
+  '/vms/{uuid}':
+    get:
+      tags:
+        - 'vms'
+      summary: reads a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns an vms
+          schema:
+            $ref: '#/definitions/vm'
+    delete:
+      tags:
+        - 'vms'
+      summary: deletes a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/metrics':
+    get:
+      tags:
+        - 'vms'
+      summary: reads a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns an vms
+          schema:
+            $ref: '#/definitions/vm'
+  '/vms/dry_run':
+    post:
+      tags:
+        - 'vms'
+      summary: |
+        This is the same as the normal Create an VM request however it stops 
+        before sending the request to the hypervisor. So no VM is ever created 
+        however it does check if the VM could be created.
+        It needs to be noted that both false positives and false negatives 
+        can occur so this is a good approximation but should not be taken as 
+        a definite. False positive are more likely then false negatives.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              package:
+                description: uuid of the package to use for the vm
+                type: string
+              dataset:
+                description: uuid of the dataset to use for the vm
+                type: string
+              config:
+                description: object with aditional
+                type: object
+      responses:
+        '201':
+          description: ok
+  '/vms/{uuid}/state':
+    put:
+      tags:
+        - 'vms'
+      summary: initiates a vm state change for the vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              action:
+                description: One of 'start', 'stop' or 'reboot'.
+                type: string
+              force:
+                description: |
+                  Used for 'stop' and 'reboot' determines if the shutdown 
+                  should be graceful or forced
+                type: boolean
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/package':
+    put:
+      tags:
+        - 'vms'
+      summary: initiates a vm state change for the vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              action:
+                description: One of 'start', 'stop' or 'reboot'
+                type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/config':
+    put:
+      tags:
+        - 'vms'
+      summary: updates the config for the vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties: 
+              hostname: 
+                description: the hostname of the vm
+                type: string
+              alias:
+                description: the vm’s alias
+                type: string
+              resolvers:
+                description: list of VM’s resolvers
+                type: array
+                items:
+                  type: string
+              autoboot:
+                description: whether the vm boots automatically or not
+                type: boolean
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/owner':
+    put:
+      tags:
+        - 'vms'
+      summary: changes the owner of the vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              org:
+                description: new owner
+                type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/nics':
+    post:
+      tags:
+        - 'vms'
+      summary: adds a new nic to a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              network:
+                description: network of the new nic
+                type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/vms/{uuid}/nics/{mac}':
+    delete:
+      tags:
+        - 'vms'
+      summary: removes a nic from a vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: mac
+          in: path
+          required: true
+          description: mac address of the nic to remove
+          type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/fw_rules':
+    post:
+      tags:
+        - 'vms'
+      description: |
+        Creates a firewall rule of the VM. One side is always the current VM 
+        the other side can be defined in 'target'.
+        TARGET
+        the string "all" for all targets.
+        an object with the key 'ip' and the IP address in a string as value 
+        for a single IP target. 
+        an object with the key 'subnet' with the base address of the subnet 
+        as string, and key 'mask' with a number indicating the relevant bits 
+        as value for a subnet as target.
+        FILTERS
+        A list of one or more ports for UDP and TCP.
+        The string "all" for UDP and TCP.
+        a list of objects containing the key 'type' and optionally 'code', 
+        both with numbers as values for ICMP.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: the action of the rule either 'block' or 'allow'
+                type: string
+              direction:
+                description: the direction of the rule, either 'inbound' or 'outbound'
+                type: string
+              target:
+                description: The other side of the rule
+                type: string #TODO: Verify
+              protocol: 
+                description: the protocol to match, either 'tcp', 'udp' or 'icmp'
+                type: string
+              filters:
+                description: the filter to narrow down the match
+                type: object
+      responses:
+        '303':
+          description: Redirect to new org
+  '/vms/{uuid}/fw_rules/{rule_id}':
+    post:
+      tags:
+        - 'vms'
+      description: |
+        deletes a firewall rule for the VM uuid, the rule id can be found in 
+        the 'rule_id' field of the rule
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: rule_id
+          in: path
+          description: the rule to remove
+          type: integer
+          required: true
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/snapshots':
+    post:
+      tags:
+        - 'vms'
+      summary: creates a zfs snapshot of the vm
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              comment:
+                description: comment for the snapshot
+                type: string
+      responses:
+        '303':
+          description: Redirect to new org
+  '/vms/{uuid}/snapshots/{snap-id}':
+    put:
+      tags:
+        - 'vms'
+      summary: | 
+        this will roll back a zfs snapshot and delete all snapshots newer 
+        then the snapshot
+        Please note that ZFS snapshots do not allow keeping snapshots newer 
+        that a rolled back snapshots so those will be deleted. Please use 
+        backups of this is a feature you need
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: snap-id
+          in: path
+          description: uuid of the snapshot to restore
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: needs to be 'rollback'
+                type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/nis/{snap-id}':
+    delete:
+      tags:
+        - 'vms'
+      summary: | 
+        deletes a Snapshot, newer snapshots will not be affected other then 
+        their size night change
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: snap-id
+          in: path
+          description: uuid of the snapshot
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/backups':
+    post:
+      tags:
+        - 'vms'
+      summary: |
+        Creates a ZFS snapshot and sends it to to LeoFS as a backup. Both 
+        incremental and full backups can be created. If a incremental backup 
+        is done the parent must be local.
+        In incremental backup here means that a incremental ZFS send is done 
+        with the parent as parent.
+        The following files are created in LeoFS:
+        <vm-uuid>/<backup-uuid> - the gzip compressed ZFS snapshot
+        <vm-uuid>/<backup-uuid>.xml - the zone config XML file from /etc/zones/<vm-uuid>.xml
+        <vm-uuid>/<backup-uuid>.parent - UUID of the parent snapshot if this is a incremental backup.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              comment:
+                description: comment for the snapshot
+                type: string
+              parent:
+                description: uuid of the parent snapshot (needs to be local)
+                type: string
+              delete:
+                description: |
+                  If 'parent' is given weather the Parent will be deleted from 
+                  the hypervisor after uploading the backup. If 'parent' is not 
+                  provided wether the backup itself will be deleted after 
+                  it is uploaded.
+                type: boolean
+      responses:
+        '303':
+          description: Redirect to new org
+  '/vms/{uuid}/backups/{backup-id}':
+    parameters:
+      - name: uuid
+        in: path
+        description: uuid of the vm
+        required: true
+        type: string
+      - name: backup-id
+        in: path
+        description: uuid of the backup to restore
+        required: true
+        type: string
+    put:
+      tags:
+        - 'vms'
+      summary: |
+        This restores a backup in the process the entire zfs volume might be 
+        destroyed and re-created, all snapshots will be deleted!
+        If the VM is 'in limbo' so not deployed to a hypervisor right now, it 
+        is possible to select the hypervisor it is re-deployed to.
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              action:
+                description: needs to be 'rollback'
+                type: string
+              hypervisor:
+                description: Restores a backup to a specifo
+                type: string
+      responses:
+        '200':
+          description: ok
+    delete:
+      tags:
+        - 'vms'
+      summary: | 
+        Deletes a Backup, this will also delete all files on LeoFS related
+        to this backup. This will also delete all children of this backup 
+        since the restore can no longer happen without the parent. However 
+        other backups who are not in the child path of this backup will not 
+        be affected, not even if they are newer.
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/services':
+    put:
+      tags:
+        - 'vms'
+      summary: |
+        Changes the service state, see man svcadm for more information
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              service:
+                description: The service identifier
+                type: string
+              action:
+                description: |
+                  one of `enable`, `disable`, `clear`, `restart`, and `refresh`
+                type: string
+      responses:
+        '200':
+          description: ok
+  '/vms/{uuid}/metrics':
+    get:
+      tags:
+        - 'vms'
+      summary: Reads a VM
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns metrics for the hypervisor
+          schema:
+            $ref: '#/definitions/metrics'
+        '503':
+          description: No metric server.
+  '/vms/{uuid}/hypervisor':
+    delete:
+      tags:
+        - 'vms'
+      summary: Deletes a vm from the hypervisor to put it in 'limbo'
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+      responses:
+        '200':
+          description: ok
