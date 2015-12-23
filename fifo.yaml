@@ -309,6 +309,8 @@ definitions:
         type: integer
       ram:
         type: integer
+      org_resources:
+        type: object
       requirements:
         type: array
         items:
@@ -1186,6 +1188,39 @@ paths:
       responses:
         '200':
           description: OK
+  '/orgs/{uuid}/resources/{resource}':
+    put:
+      tags:
+        - 'orgs'
+      summary: Deletes a trigger from an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the org
+          required: true
+          type: string
+        - name: resource
+          in: path
+          description: Name of the resoruces
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              dec:
+                description: |
+                  Amount on how much to decrease the given resourcs
+                type: integer
+              inc:
+                description: |
+                  Amount on how much to increase the given resourcs
+                type: integer
+      responses:
+        '204':
+          description: OK
   '/orgs/{uuid}/docker/networks/{scope}':
     put:
       tags:
@@ -1963,6 +1998,9 @@ paths:
                 type: string
               requirements:
                 description: A list of rules to create
+                type: object
+              org_resources:
+                description: A mapping between resource name and claim
                 type: object
       responses:
         '200':
