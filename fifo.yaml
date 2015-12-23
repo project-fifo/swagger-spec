@@ -1,9 +1,9 @@
 swagger: '2.0'
 basePath: /api/2
 consumes:
-  - applicaiton/json
+  - application/json
 produces:
-  - applicaiton/json
+  - application/json
 info:
   version: 2.0.0
   title: Project-FiFo
