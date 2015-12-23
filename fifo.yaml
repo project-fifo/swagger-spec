@@ -56,10 +56,10 @@ definitions:
         type: string
   apikey:
     properties:
-      bearer: 
+      bearer:
         type: string
       id:
-        $ref: '#/definitions/uuid'      
+        $ref: '#/definitions/uuid'
   token:
     properties:
       client:
@@ -133,7 +133,7 @@ definitions:
       redirect_uris: # TODO: THIS IS NOT CORRECT
         type: array
         items:
-          type: string 
+          type: string
       permissions:
         type: array
         items:
@@ -152,7 +152,7 @@ definitions:
         type: object
       name:
         type: string
-      permissions: 
+      permissions:
         type: array
         items:
           $ref: '#/definitions/permission'
@@ -167,7 +167,7 @@ definitions:
       triggers:
         type: array
         items:
-          type: string 
+          type: string
       uuid:
         $ref: '#/definitions/uuid'
   grouping:
@@ -408,8 +408,8 @@ paths:
       tags:
         - 'users'
       summary: |
-        Tests if a user has is allowed to perform an action. 
-        Please note that 403 here does not mean the user is not allowed 
+        Tests if a user has is allowed to perform an action.
+        Please note that 403 here does not mean the user is not allowed
         but that the requesting token was not allowed to test for the client!
       responses:
         '200':
@@ -470,7 +470,7 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               keys:
                 description: key/value pair for the key
                 type: string
@@ -512,7 +512,7 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               otp:
                 description: OTP from the YubiKey to add
                 type: string
@@ -538,7 +538,7 @@ paths:
       responses:
         '200':
           description: OK
-  '/users/{uuid}/orgs/{org}' :
+  '/users/{uuid}/orgs/{org}':
     parameters:
       - name: uuid
         in: path
@@ -554,9 +554,9 @@ paths:
       tags:
         - 'users'
       summary: |
-        Adds a user to an Organisation. The first joined Organisation 
-        will automatically be set as active. Any further Organisations 
-        need to be selected as active by passing the 'active' parameter 
+        Adds a user to an Organisation. The first joined Organisation
+        will automatically be set as active. Any further Organisations
+        need to be selected as active by passing the 'active' parameter
         in a JSON.
       parameters:
         - name: body
@@ -564,7 +564,7 @@ paths:
           required: false
           schema:
             type: object
-            properties: 
+            properties:
               active:
                 description: used to set an org
                 type: boolean
@@ -583,8 +583,8 @@ paths:
       tags:
         - 'users'
       summary: |
-        Crates a API token for a user with a given scope, please keep in 
-        mind that the reply to this request is THE ONLY TIME the bearer 
+        Crates a API token for a user with a given scope, please keep in
+        mind that the reply to this request is THE ONLY TIME the bearer
         token can be accessed!
       parameters:
         - name: uuid
@@ -597,7 +597,7 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               comment:
                 description: A comment for the token
                 type: string
@@ -608,7 +608,7 @@ paths:
                   type: string
       responses:
         '200':
-          description: OK 
+          description: OK
           schema:
             $ref: '#/definitions/apikey'
   '/users/{uuid}/tokens/{token-id}' :
@@ -729,8 +729,8 @@ paths:
       tags:
         - 'clients'
       summary: |
-        Tests if a client has is allowed to perform an action. Please note 
-        that 403 here does not mean the client is not allowed but that the 
+        Tests if a client has is allowed to perform an action. Please note
+        that 403 here does not mean the client is not allowed but that the
         requesting token was not allowed to test for the client!
       parameters:
         - name: uuid
@@ -750,7 +750,7 @@ paths:
     put:
       tags:
         - 'clients'
-      summary: Grants a permission> to a client 
+      summary: Grants a permission> to a client
       parameters:
         - name: uuid
           in: path
@@ -769,7 +769,7 @@ paths:
     delete:
       tags:
         - 'clients'
-      summary: Revokes a permission to a client 
+      summary: Revokes a permission to a client
       parameters:
         - name: uuid
           in: path
@@ -789,7 +789,7 @@ paths:
     post:
       tags:
         - 'clients'
-      summary: Adds an URI to the valid redirect URI’s for this client 
+      summary: Adds an URI to the valid redirect URI’s for this client
       parameters:
         - name: uuid
           in: path
@@ -804,7 +804,7 @@ paths:
             properties:
               uri:
                 description: the URI to add
-                type: string         
+                type: string
       responses:
         '200':
           description: OK
@@ -1011,12 +1011,12 @@ paths:
     get:
       tags:
         - 'orgs'
-      summary: | 
-        This will grab accounting data for a period between start and end. 
-        The data presented will include all data points for every resource 
+      summary: |
+        This will grab accounting data for a period between start and end.
+        The data presented will include all data points for every resource
         that existed in this timeframe not only those in the timeframe.
-        This allows reconstructing the entire situation during the time 
-        frame, including resources that were created before and destroyed 
+        This allows reconstructing the entire situation during the time
+        frame, including resources that were created before and destroyed
         after the period.
       parameters:
         - name: uuid
@@ -1035,7 +1035,7 @@ paths:
                 type: integer
               end:
                 description: Timestamp of the end of the accounting period
-                type: integer     
+                type: integer
       responses:
         '200':
           description: OK
@@ -1046,7 +1046,7 @@ paths:
       tags:
         - 'orgs'
       summary: |
-        This trigger is executed when a new user is created from someone 
+        This trigger is executed when a new user is created from someone
         who belongs to an org
       parameters:
         - name: uuid
@@ -1062,19 +1062,19 @@ paths:
             properties:
               action:
                 description: |
-                  Action to be performed, one of 'join_role', 'join_org', 
+                  Action to be performed, one of 'join_role', 'join_org',
                   'role_grant' and 'user_grant'
                 type: string
               target:
                 description: |
                   For 'join_*' actions the role or org to be joined, for
                   '*_grant' the role or user the permission to be granted to
-                type: string  
+                type: string
               base:
                 description: |
-                  For '*_grant' triggers, the base of the permissions to 
+                  For '*_grant' triggers, the base of the permissions to
                   be granted
-                type: string 
+                type: string
               permission:
                 description: The rest of the permission to be granted
                 type: array
@@ -1088,7 +1088,7 @@ paths:
       tags:
         - 'orgs'
       summary: |
-        This trigger is executed when a new dataset is created from someone 
+        This trigger is executed when a new dataset is created from someone
         who belongs to this org
       parameters:
         - name: uuid
@@ -1104,19 +1104,19 @@ paths:
             properties:
               action:
                 description: |
-                  Action to be performed, one of 'join_role', 'join_org', 
+                  Action to be performed, one of 'join_role', 'join_org',
                   'role_grant' and 'user_grant'
                 type: string
               target:
                 description: |
                   For 'join_*' actions the role or org to be joined, for
                   '*_grant' the role or user the permission to be granted to
-                type: string  
+                type: string
               base:
                 description: |
-                  For '*_grant' triggers, the base of the permissions to 
+                  For '*_grant' triggers, the base of the permissions to
                   be granted
-                type: string 
+                type: string
               permission:
                 description: The rest of the permission to be granted
                 type: array
@@ -1130,7 +1130,7 @@ paths:
       tags:
         - 'orgs'
       summary: |
-        This trigger is executed when a new VM is created by someone who 
+        This trigger is executed when a new VM is created by someone who
         belongs to this org
       parameters:
         - name: uuid
@@ -1146,19 +1146,19 @@ paths:
             properties:
               action:
                 description: |
-                  Action to be performed, one of 'join_role', 'join_org', 
+                  Action to be performed, one of 'join_role', 'join_org',
                   'role_grant' and 'user_grant'
                 type: string
               target:
                 description: |
                   For 'join_*' actions the role or org to be joined, for
                   '*_grant' the role or user the permission to be granted to
-                type: string  
+                type: string
               base:
                 description: |
-                  For '*_grant' triggers, the base of the permissions to 
+                  For '*_grant' triggers, the base of the permissions to
                   be granted
-                type: string 
+                type: string
               permission:
                 description: The rest of the permission to be granted
                 type: array
@@ -1185,6 +1185,38 @@ paths:
           type: integer
       responses:
         '200':
+          description: OK
+  '/orgs/{uuid}/docker/networks/{scope}':
+    put:
+      tags:
+        - 'orgs'
+      summary: Deletes a trigger from an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the org
+          required: true
+          type: string
+        - name: scope
+          in: path
+          description: Network type, either 'public' or 'private'
+          required: true
+          type: string
+          enum:
+            - 'public'
+            - 'private'
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              network:
+                description: |
+                  The UUID of the network to add
+                type: string
+      responses:
+        '204':
           description: OK
   #------------------
   # Groupings
@@ -1512,8 +1544,8 @@ paths:
       tags:
         - 'hypervisors'
       summary: |
-        deletes a hypervisor. every vm still residing on this hypervisor 
-        will either be put in 'limbo' when at least one full backup exists, 
+        deletes a hypervisor. every vm still residing on this hypervisor
+        will either be put in 'limbo' when at least one full backup exists,
         or be deleted if not.
       parameters:
         - name: uuid
@@ -1529,7 +1561,7 @@ paths:
       tags:
         - 'hypervisors'
       summary: |
-        sets a hypervisor characteristic, this can be later used on rules 
+        sets a hypervisor characteristic, this can be later used on rules
         to match against.
       parameters:
         - name: uuid
@@ -1643,7 +1675,7 @@ paths:
               tag:
                 description: NIC Tag for the IP Range to use
                 type: string
-              subnet: 
+              subnet:
                 description: The network address of the subnet
                 type: string
               netmask:
@@ -1658,7 +1690,7 @@ paths:
               last:
                 description: Last address to hand out (must be part of subnet!)
                 type: string
-              vlan: 
+              vlan:
                 description: VLan to tag the nics with
                 type: integer
       responses:
@@ -1720,7 +1752,7 @@ paths:
       tags:
         - 'networks'
       summary: |
-        Lists all networks visible to the user. 
+        Lists all networks visible to the user.
       description: |
         See 'Get Network' for the fields available for 'full-list-fields'
       parameters:
@@ -1850,45 +1882,45 @@ paths:
         'WEIGHT'
         A number (positive or negative) or the string "most", "cant" for strong
         enforcement or "scale" and "random" must, cant, and <number> rules
-        This rules simply compare an attribute of the hypervisor against a 
-        value and either enforces a the rule (must/cant) or gives out points, 
+        This rules simply compare an attribute of the hypervisor against a
+        value and either enforces a the rule (must/cant) or gives out points,
         both positive and negative to rate the found hypervisors.
         attribute
-        The attribute to check on the hypervisors, this can be a json like 
-        path so for example "characteristics.colour" will look up colour in 
+        The attribute to check on the hypervisors, this can be a json like
+        path so for example "characteristics.colour" will look up colour in
         the hypervisors characteristics
         Value
         The value to check against, this can be a number, a string, or an array.
         condition
         One of:
-        >=, > - Checks if the value of attribute is larger (or equal) to the 
+        >=, > - Checks if the value of attribute is larger (or equal) to the
         value
-        =<, < - Checks if the value of attribute is smaller (or equal) to the 
+        =<, < - Checks if the value of attribute is smaller (or equal) to the
         value
         =:= - Checks if the value of attribute is equal to the value
         =/= - Checks if the value of attribute is not equal to the value
-        "subset" - Checks if the value of attribute is a subset of value 
+        "subset" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "superset" - Checks if the value of attribute is a subset of value 
+        "superset" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "disjoint" - Checks if the value of attribute is a subset of value 
+        "disjoint" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "element" - Checks if the value of attribute is a subset of value 
+        "element" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "allowed" - Checks if the value of attribute is a subset of value 
+        "allowed" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
         scale rules
-        This rules linearly map an attributes value onto a given scale and 
+        This rules linearly map an attributes value onto a given scale and
         give the result as points for hypervisor selection.
         attribute
-        The attribute to check on the hypervisors, this can be a json like 
-        path so for example "characteristics.cores" will look up cores in the 
+        The attribute to check on the hypervisors, this can be a json like
+        path so for example "characteristics.cores" will look up cores in the
         hypervisors characteristics This must be an numeric value towork
         low, and high
         The lowest and highest number of the scale, to map against.
         random ruleS
-        This rules simply generate a random number on a given scale, this 
-        allows making non deterministic rules. The resulting number is used 
+        This rules simply generate a random number on a given scale, this
+        allows making non deterministic rules. The resulting number is used
         as points for hypervisor selection.
         low, and high
         The lowest and highest number the random number is generated from.
@@ -1898,13 +1930,13 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
-              name: 
+            properties:
+              name:
                 description: Name of the package
                 type: string
               quota:
                 description: |
-                  'GB' of quota to give the package, for KVM this applies as 
+                  'GB' of quota to give the package, for KVM this applies as
                   secondary disk
                 type: integer
               ram:
@@ -1915,12 +1947,12 @@ paths:
                 type: integer
               cpu_shares:
                 description: |
-                  Shares of CPU time when two zones compete. (Defaults to 
+                  Shares of CPU time when two zones compete. (Defaults to
                   % of memory)
                 type: string
               zfs_io_priority:
                 description: |
-                  ZFS Priority if zones are competing. (Defaults to % of 
+                  ZFS Priority if zones are competing. (Defaults to % of
                   memory)
                 type: integer
               blicksize:
@@ -1990,8 +2022,8 @@ paths:
       tags:
         - 'vms'
       summary: |
-        this request queues a new VM creation. Most of the keys in config 
-        are self-explanatory the one noteworthy is networks however. it is 
+        this request queues a new VM creation. Most of the keys in config
+        are self-explanatory the one noteworthy is networks however. it is
         a map of nics (provided by the dataset) to UUIDs of networks (
         not ip ranges!).
       parameters:
@@ -2006,10 +2038,10 @@ paths:
                 type: string
               dataset:
                 description: uuid of the dataset to use for the vm
-                type: string  
+                type: string
               config:
-                description: object with additional 
-                type: object 
+                description: object with additional
+                type: object
       responses:
         '303':
           description: redirect to new org
@@ -2063,11 +2095,11 @@ paths:
       tags:
         - 'vms'
       summary: |
-        This is the same as the normal Create an VM request however it stops 
-        before sending the request to the hypervisor. So no VM is ever created 
+        This is the same as the normal Create an VM request however it stops
+        before sending the request to the hypervisor. So no VM is ever created
         however it does check if the VM could be created.
-        It needs to be noted that both false positives and false negatives 
-        can occur so this is a good approximation but should not be taken as 
+        It needs to be noted that both false positives and false negatives
+        can occur so this is a good approximation but should not be taken as
         a definite. False positive are more likely then false negatives.
       parameters:
         - name: body
@@ -2075,7 +2107,7 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               package:
                 description: uuid of the package to use for the vm
                 type: string
@@ -2104,13 +2136,13 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               action:
                 description: One of 'start', 'stop' or 'reboot'.
                 type: string
               force:
                 description: |
-                  Used for 'stop' and 'reboot' determines if the shutdown 
+                  Used for 'stop' and 'reboot' determines if the shutdown
                   should be graceful or forced
                 type: boolean
       responses:
@@ -2132,7 +2164,7 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
+            properties:
               action:
                 description: One of 'start', 'stop' or 'reboot'
                 type: string
@@ -2155,8 +2187,8 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
-              hostname: 
+            properties:
+              hostname:
                 description: the hostname of the vm
                 type: string
               alias:
@@ -2243,19 +2275,19 @@ paths:
       tags:
         - 'vms'
       description: |
-        Creates a firewall rule of the VM. One side is always the current VM 
+        Creates a firewall rule of the VM. One side is always the current VM
         the other side can be defined in 'target'.
         TARGET
         the string "all" for all targets.
-        an object with the key 'ip' and the IP address in a string as value 
-        for a single IP target. 
-        an object with the key 'subnet' with the base address of the subnet 
-        as string, and key 'mask' with a number indicating the relevant bits 
+        an object with the key 'ip' and the IP address in a string as value
+        for a single IP target.
+        an object with the key 'subnet' with the base address of the subnet
+        as string, and key 'mask' with a number indicating the relevant bits
         as value for a subnet as target.
         FILTERS
         A list of one or more ports for UDP and TCP.
         The string "all" for UDP and TCP.
-        a list of objects containing the key 'type' and optionally 'code', 
+        a list of objects containing the key 'type' and optionally 'code',
         both with numbers as values for ICMP.
       parameters:
         - name: uuid
@@ -2278,7 +2310,7 @@ paths:
               target:
                 description: The other side of the rule
                 type: string #TODO: Verify
-              protocol: 
+              protocol:
                 description: the protocol to match, either 'tcp', 'udp' or 'icmp'
                 type: string
               filters:
@@ -2292,7 +2324,7 @@ paths:
       tags:
         - 'vms'
       description: |
-        deletes a firewall rule for the VM uuid, the rule id can be found in 
+        deletes a firewall rule for the VM uuid, the rule id can be found in
         the 'rule_id' field of the rule
       parameters:
         - name: uuid
@@ -2335,11 +2367,11 @@ paths:
     put:
       tags:
         - 'vms'
-      summary: | 
-        this will roll back a zfs snapshot and delete all snapshots newer 
+      summary: |
+        this will roll back a zfs snapshot and delete all snapshots newer
         then the snapshot
-        Please note that ZFS snapshots do not allow keeping snapshots newer 
-        that a rolled back snapshots so those will be deleted. Please use 
+        Please note that ZFS snapshots do not allow keeping snapshots newer
+        that a rolled back snapshots so those will be deleted. Please use
         backups of this is a feature you need
       parameters:
         - name: uuid
@@ -2368,8 +2400,8 @@ paths:
     delete:
       tags:
         - 'vms'
-      summary: | 
-        deletes a Snapshot, newer snapshots will not be affected other then 
+      summary: |
+        deletes a Snapshot, newer snapshots will not be affected other then
         their size night change
       parameters:
         - name: uuid
@@ -2390,10 +2422,10 @@ paths:
       tags:
         - 'vms'
       summary: |
-        Creates a ZFS snapshot and sends it to to LeoFS as a backup. Both 
-        incremental and full backups can be created. If a incremental backup 
+        Creates a ZFS snapshot and sends it to to LeoFS as a backup. Both
+        incremental and full backups can be created. If a incremental backup
         is done the parent must be local.
-        In incremental backup here means that a incremental ZFS send is done 
+        In incremental backup here means that a incremental ZFS send is done
         with the parent as parent.
         The following files are created in LeoFS:
         <vm-uuid>/<backup-uuid> - the gzip compressed ZFS snapshot
@@ -2419,9 +2451,9 @@ paths:
                 type: string
               delete:
                 description: |
-                  If 'parent' is given weather the Parent will be deleted from 
-                  the hypervisor after uploading the backup. If 'parent' is not 
-                  provided wether the backup itself will be deleted after 
+                  If 'parent' is given weather the Parent will be deleted from
+                  the hypervisor after uploading the backup. If 'parent' is not
+                  provided wether the backup itself will be deleted after
                   it is uploaded.
                 type: boolean
       responses:
@@ -2443,9 +2475,9 @@ paths:
       tags:
         - 'vms'
       summary: |
-        This restores a backup in the process the entire zfs volume might be 
+        This restores a backup in the process the entire zfs volume might be
         destroyed and re-created, all snapshots will be deleted!
-        If the VM is 'in limbo' so not deployed to a hypervisor right now, it 
+        If the VM is 'in limbo' so not deployed to a hypervisor right now, it
         is possible to select the hypervisor it is re-deployed to.
       parameters:
         - name: body
@@ -2466,11 +2498,11 @@ paths:
     delete:
       tags:
         - 'vms'
-      summary: | 
+      summary: |
         Deletes a Backup, this will also delete all files on LeoFS related
-        to this backup. This will also delete all children of this backup 
-        since the restore can no longer happen without the parent. However 
-        other backups who are not in the child path of this backup will not 
+        to this backup. This will also delete all children of this backup
+        since the restore can no longer happen without the parent. However
+        other backups who are not in the child path of this backup will not
         be affected, not even if they are newer.
       responses:
         '200':
