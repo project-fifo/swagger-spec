@@ -37,10 +37,18 @@
     "definitions": {
         "uuid": {
             "type": "string",
-            "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         },
         "metrics": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "<key>": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
         },
         "permission": {
             "type": "array",
@@ -378,7 +386,82 @@
             }
         },
         "vm": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "backups": {
+                    "type": "object",
+                    "properties": {
+                        "comment": {
+                            "type": "string"
+                        },
+                        "files": {
+                            "type": "object",
+                            "properties": {
+                                "<file>": {
+                                    "type": "object",
+                                    "properties": {
+                                        "sha1": {
+                                            "type": "string"
+                                        },
+                                        "size": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "local": {
+                            "type": "boolean"
+                        },
+                        "local_size": {
+                            "type": "integer"
+                        },
+                        "pending": {
+                            "type": "boolean"
+                        },
+                        "state": {
+                            "type": "string",
+                            "enum": [
+                                "completed",
+                                "pending"
+                            ]
+                        },
+                        "xml": {
+                            "type": "boolean"
+                        }
+                    }
+                },
+                "config": {
+                    "type": "object"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "created_by": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "dataset": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "hypervisor": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "package": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "owner": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "uuid": {
+                    "$ref": "#/definitions/uuid"
+                },
+                "docker": {
+                    "type": "object"
+                }
+            }
         },
         "iprange": {
             "properties": {
@@ -1791,22 +1874,18 @@
                         "type": "string"
                     },
                     {
-                        "name": "body",
-                        "in": "body",
+                        "name": "start",
+                        "in": "query",
                         "required": true,
-                        "schema": {
-                            "type": "object",
-                            "properties": {
-                                "start": {
-                                    "description": "Timestamp of the start of the accounting period",
-                                    "type": "integer"
-                                },
-                                "end": {
-                                    "description": "Timestamp of the end of the accounting period",
-                                    "type": "integer"
-                                }
-                            }
-                        }
+                        "description": "Timestamp of the start of the accounting period",
+                        "type": "integer"
+                    },
+                    {
+                        "name": "end",
+                        "in": "query",
+                        "required": true,
+                        "description": "Timestamp of the end of the accounting period",
+                        "type": "integer"
                     }
                 ],
                 "responses": {
