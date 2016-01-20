@@ -1,6 +1,6 @@
 {
     "swagger": "2.0",
-    "basePath": "/api/2",
+    "basePath": "/api/3",
     "consumes": [
         "application/json"
     ],
@@ -8,7 +8,7 @@
         "application/json"
     ],
     "info": {
-        "version": "2.0.0",
+        "version": "3.0.0",
         "title": "Project-FiFo"
     },
     "parameters": {
@@ -472,6 +472,274 @@
         }
     },
     "paths": {
+        "/oauth2/auth": {
+            "get": {
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "OAuth2 Authorization Code Request and Implict Request",
+                "description": "This endpoint serves both 'Authorization Code Request' and the\n'Implict Request' parts of the OAuth 2 workflow depending on the\n*response_type* provided.\n",
+                "parameters": [
+                    {
+                        "name": "response_type",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "enum": [
+                            "code",
+                            "token"
+                        ]
+                    },
+                    {
+                        "name": "client_id",
+                        "in": "query",
+                        "type": "string",
+                        "required": true,
+                        "description": "ID of the client"
+                    },
+                    {
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "type": "string",
+                        "description": "The URI redirected to at the end of the OAuth2 dance",
+                        "required": true
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "type": "string",
+                        "description": "client state that gets passed back to the redirect uri"
+                    },
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "type": "string",
+                        "description": "list of scopes to claim"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Redirect to new user"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "Authorization Code grant and",
+                "description": "Serves both the Authorization Code Grant and Implict Grant\n* [4.1.1 Authorization Code Grant / Authorization Request](https://tools.ietf.org/html/rfc6749#section-4.1.1)\n* [4.2.1 Implicit Grant / Authorization Request](https://tools.ietf.org/html/rfc6749#section-4.2.1)\n",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "response_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "code",
+                                        "token"
+                                    ]
+                                },
+                                "client_id": {
+                                    "type": "string",
+                                    "description": "ID of the client"
+                                },
+                                "redirect_uri": {
+                                    "type": "string",
+                                    "description": "The URI redirected to at the end of the OAuth2 dance"
+                                },
+                                "scope": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "list of scopes to claim"
+                                },
+                                "state": {
+                                    "type": "string",
+                                    "description": "client state that gets passed back to the redirect uri"
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "the username"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "the password"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "302": {
+                        "description": "Redirects to the redirect_uri with the `access_code` as query\nparameter.\n"
+                    }
+                }
+            }
+        },
+        "/oauth2/token": {
+            "post": {
+                "tags": [
+                    "oauth"
+                ],
+                "summary": "OAuth2 token endpoint",
+                "description": "This endpoint serves the following parts of the OAuth workflow, please\nsee the linked specifications for details as it does not fit the swagger\nspec definition language.\n* [4.1.3 Access Token Request](https://tools.ietf.org/html/rfc6749#section-4.1.3)\n* [4.4.2 Access Token Request](https://tools.ietf.org/html/rfc6749#section-4.4.2)\n* [4.2.1 Implicit Grant / Authorization Request](https://tools.ietf.org/html/rfc6749#section-4.2.1)\n* [4.3 Resource Owner Password Credentials Grant](https://tools.ietf.org/html/rfc6749#section-4.3)\n* [6 Refreshing an Access Token](https://tools.ietf.org/html/rfc6749#section-6)\n",
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "grant_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "authorization_code",
+                                        "client_credentials",
+                                        "refresh_token",
+                                        "password"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The token was sucessfully provided.",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "access_token": {
+                                    "type": "string"
+                                },
+                                "token_type": {
+                                    "type": "string",
+                                    "enum": [
+                                        "bearer"
+                                    ]
+                                },
+                                "expires_in": {
+                                    "type": "integer"
+                                },
+                                "refresh_token": {
+                                    "type": "string",
+                                    "description": "Only for Access Token Request"
+                                },
+                                "scope": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/scopes": {
+            "get": {
+                "tags": [
+                    "scope"
+                ],
+                "summary": "lists the scopes",
+                "responses": {
+                    "200": {
+                        "description": "The list of the",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "default": {
+                                        "type": "boolean",
+                                        "description": "weather this scope is a default scope or not"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "description": "the description of the scope"
+                                    },
+                                    "scope": {
+                                        "type": "string",
+                                        "description": "the name of the scope"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions": {
+            "delete": {
+                "tags": [
+                    "oauth",
+                    "sessions"
+                ],
+                "summary": "deletes a token",
+                "responses": {
+                    "204": {
+                        "description": "ok"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "sessions",
+                    "users"
+                ],
+                "summary": "retrieves information about the current session",
+                "responses": {
+                    "200": {
+                        "description": "the logged in user",
+                        "schema": {
+                            "$ref": "#/definitions/user"
+                        }
+                    }
+                }
+            }
+        },
+        "/sessions/one_time_token": {
+            "get": {
+                "tags": [
+                    "oauth",
+                    "sessions"
+                ],
+                "summary": "creates a one time toke",
+                "description": "FiFo uses one time tokens to secure web socket, that way\nthe token can be passed as a query parameter without securty\nconcerns since it will be only valid for a single use. One time\ntokens have a very short lifetime and will be invalidated after\nthe first use.\n",
+                "responses": {
+                    "200": {
+                        "description": "the token and experiey",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "token": {
+                                    "type": "string",
+                                    "description": "the token"
+                                },
+                                "expiery": {
+                                    "type": "integer",
+                                    "description": "lifetime of the token in seconds"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "tags": [
@@ -566,7 +834,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/user"
+                        }
                     }
                 }
             },
@@ -1167,7 +1438,7 @@
                 "tags": [
                     "clients"
                 ],
-                "summary": "Adds an URI to the valid redirect URI’s for this client",
+                "summary": "Adds an URI to the valid redirect URIâ€™s for this client",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1435,7 +1706,7 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "the name of the organization",
+                "summary": "Creates an organisation",
                 "parameters": [
                     {
                         "name": "body",
@@ -1509,7 +1780,8 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "This will grab accounting data for a period between start and end.\nThe data presented will include all data points for every resource\nthat existed in this timeframe not only those in the timeframe.\nThis allows reconstructing the entire situation during the time\nframe, including resources that were created before and destroyed\nafter the period.\n",
+                "summary": "Read accounitng data",
+                "description": "This will grab accounting data for a period between start and end.\nThe data presented will include all data points for every resource\nthat existed in this timeframe not only those in the timeframe.\nThis allows reconstructing the entire situation during the time\nframe, including resources that were created before and destroyed\nafter the period.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1552,7 +1824,8 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "This trigger is executed when a new user is created from someone\nwho belongs to an org\n",
+                "summary": "Creates a user create trigger",
+                "description": "This trigger is executed when a new user is created from someone\nwho belongs to an org\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1603,7 +1876,8 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "This trigger is executed when a new dataset is created from someone\nwho belongs to this org\n",
+                "summary": "Creates a user dataset trigger",
+                "description": "This trigger is executed when a new dataset is created from someone\nwho belongs to this org\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1654,7 +1928,8 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "This trigger is executed when a new VM is created by someone who\nbelongs to this org\n",
+                "summary": "Creates a user vm trigger",
+                "description": "This trigger is executed when a new VM is created by someone who\nbelongs to this org\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1734,7 +2009,8 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "Deletes a trigger from an organization",
+                "summary": "Set org resources",
+                "description": "Increases or decreases resources for an org.",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1781,7 +2057,7 @@
                 "tags": [
                     "orgs"
                 ],
-                "summary": "Deletes a trigger from an organization",
+                "summary": "Links a docker network",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -3214,11 +3490,11 @@
                                     "type": "string"
                                 },
                                 "alias": {
-                                    "description": "the vm’s alias",
+                                    "description": "the vmâ€™s alias",
                                     "type": "string"
                                 },
                                 "resolvers": {
-                                    "description": "list of VM’s resolvers",
+                                    "description": "list of VMâ€™s resolvers",
                                     "type": "array",
                                     "items": {
                                         "type": "string"
@@ -3590,6 +3866,17 @@
                     "type": "string"
                 }
             ],
+            "get": {
+                "tags": [
+                    "vms"
+                ],
+                "summary": "This will check the sha1 hash of the storeed backup, to do this the\nbackup is internally streamed and a new sha1 is calcualated. Both\nold and new values are then returned.\n",
+                "responses": {
+                    "200": {
+                        "description": "The calculation could be performed, please not that this does not mean\nthat the sha sums are matching, just that the calculation could be performed.\n"
+                    }
+                }
+            },
             "put": {
                 "tags": [
                     "vms"
