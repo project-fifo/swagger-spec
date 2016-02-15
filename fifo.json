@@ -57,20 +57,104 @@
             }
         },
         "requirement": {
-            "properties": {
-                "attribute": {
-                    "type": "string"
+            "allOf": [
+                {
+                    "type": "object",
+                    "properties": {
+                        "weight": {
+                            "type": "string",
+                            "enum": [
+                                "scale"
+                            ]
+                        },
+                        "attribute": {
+                            "type": "string"
+                        },
+                        "low": {
+                            "type": "integer"
+                        },
+                        "high": {
+                            "type": "integer"
+                        }
+                    }
                 },
-                "condition": {
-                    "type": "string"
+                {
+                    "type": "object",
+                    "properties": {
+                        "weight": {
+                            "type": "string",
+                            "enum": [
+                                "random"
+                            ]
+                        },
+                        "low": {
+                            "type": "integer"
+                        },
+                        "high": {
+                            "type": "integer"
+                        }
+                    }
                 },
-                "value": {
-                    "type": "string"
-                },
-                "weight": {
-                    "type": "string"
+                {
+                    "type": "object",
+                    "properties": {
+                        "attribute": {
+                            "type": "string"
+                        },
+                        "condition": {
+                            "type": "string",
+                            "enum": [
+                                ">=",
+                                "=<",
+                                ">",
+                                "<",
+                                "=:=",
+                                "=/=",
+                                "superset",
+                                "subset",
+                                "disjoint",
+                                "element"
+                            ]
+                        },
+                        "value": {
+                            "allOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            ]
+                        },
+                        "weight": {
+                            "allOf": [
+                                {
+                                    "type": "string",
+                                    "enum": [
+                                        "must",
+                                        "cant"
+                                    ]
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        }
+                    }
                 }
-            }
+            ]
         },
         "apikey": {
             "properties": {
@@ -1521,7 +1605,7 @@
                 "tags": [
                     "clients"
                 ],
-                "summary": "Adds an URI to the valid redirect URIâ€™s for this client",
+                "summary": "Adds an URI to the valid redirect URI’s for this client",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -3225,7 +3309,10 @@
                                 },
                                 "requirements": {
                                     "description": "A list of rules to create",
-                                    "type": "object"
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/requirement"
+                                    }
                                 },
                                 "org_resources": {
                                     "description": "A mapping between resource name and claim",
@@ -3507,6 +3594,62 @@
                 }
             }
         },
+        "/vms/{uuid}/console": {
+            "put": {
+                "tags": [
+                    "vms"
+                ],
+                "summary": "executes a single command on the zones console",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "uuid of the vm",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "command": {
+                                    "description": "The command to execute",
+                                    "type": "string"
+                                },
+                                "args": {
+                                    "description": "An array of arguments to pass to the command",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "exit_code": {
+                                    "type": "integer",
+                                    "description": "Exit code of the command executed"
+                                },
+                                "output": {
+                                    "type": "string",
+                                    "description": "Output of the command (stdout,stderr combined)"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/vms/{uuid}/package": {
             "put": {
                 "tags": [
@@ -3530,7 +3673,12 @@
                             "properties": {
                                 "action": {
                                     "description": "One of 'start', 'stop' or 'reboot'",
-                                    "type": "string"
+                                    "type": "string",
+                                    "enum": [
+                                        "start",
+                                        "stop",
+                                        "reboot"
+                                    ]
                                 }
                             }
                         }
@@ -3569,11 +3717,11 @@
                                     "type": "string"
                                 },
                                 "alias": {
-                                    "description": "the vmâ€™s alias",
+                                    "description": "the vm’s alias",
                                     "type": "string"
                                 },
                                 "resolvers": {
-                                    "description": "list of VMâ€™s resolvers",
+                                    "description": "list of VM’s resolvers",
                                     "type": "array",
                                     "items": {
                                         "type": "string"
@@ -3652,8 +3800,7 @@
                             "type": "object",
                             "properties": {
                                 "network": {
-                                    "description": "network of the new nic",
-                                    "type": "string"
+                                    "$ref": "#/definitions/uuid"
                                 }
                             }
                         }
@@ -3661,7 +3808,7 @@
                 ],
                 "responses": {
                     "303": {
-                        "description": "Redirect to new org"
+                        "description": "Redirect to the changed VM"
                     }
                 }
             }
@@ -3690,7 +3837,49 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "ok"
+                        "description": "adds a new nic"
+                    }
+                }
+            }
+        },
+        "/vms/{uuid}/hostname/{nic}": {
+            "put": {
+                "tags": [
+                    "vms"
+                ],
+                "summary": "Sets the hostname of a nice, setting it empty removes it.",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "uuid of the vm",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "nic",
+                        "in": "path",
+                        "required": true,
+                        "description": "name of the nic for wich the hostname shoulld be set",
+                        "type": "string"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "hostname": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "sets the hostname"
                     }
                 }
             }
@@ -3970,14 +4159,28 @@
                             "type": "object",
                             "properties": {
                                 "action": {
-                                    "description": "needs to be 'rollback'",
-                                    "type": "string"
+                                    "description": "needs to be 'rollback' or 'restore'. rules and package are\nonly valid for restore\n",
+                                    "type": "string",
+                                    "enum": [
+                                        "rollback",
+                                        "restore"
+                                    ]
                                 },
-                                "hypervisor": {
-                                    "description": "Restores a backup to a specifo",
-                                    "type": "string"
+                                "rules": {
+                                    "description": "Additional rules for the restore",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/requirement"
+                                    }
+                                },
+                                "package": {
+                                    "$ref": "#/definitions/uuid"
                                 }
-                            }
+                            },
+                            "required": [
+                                "action",
+                                "rules"
+                            ]
                         }
                     }
                 ],

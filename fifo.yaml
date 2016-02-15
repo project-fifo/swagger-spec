@@ -50,15 +50,63 @@ definitions:
     items:
       type: string
   requirement:
-    properties:
-      attribute:
-        type: string
-      condition:
-        type: string
-      value:
-        type: string
-      weight:
-        type: string
+    allOf:
+      - type: object
+        properties:
+          weight:
+            type: string
+            enum:
+              - 'scale'
+          attribute:
+            type: string
+          low:
+            type: integer
+          high:
+            type: integer
+      - type: object
+        properties:
+          weight:
+            type: string
+            enum:
+              - 'random'
+          low:
+            type: integer
+          high:
+            type: integer
+      - type: object
+        properties:
+          attribute:
+            type: string
+          condition:
+            type: string
+            enum:
+              - '>='
+              - '=<'
+              - '>'
+              - '<'
+              - '=:='
+              - '=/='
+              - 'superset'
+              - 'subset'
+              - 'disjoint'
+              - 'element'
+          value:
+            allOf:
+              - type: string
+              - type: integer
+              - type: array
+                items:
+                  type: integer
+              - type: array
+                items:
+                  type: string
+          weight:
+            allOf:
+              - type: string
+                enum:
+                  - must
+                  - cant
+              - type: integer
   apikey:
     properties:
       bearer:
@@ -311,9 +359,8 @@ definitions:
         $ref: '#/definitions/uuid'
       uuid:
         $ref: '#/definitions/uuid'
-      docker: 
+      docker:
         type: object
-      
   iprange:
     properties:
       metadata:
@@ -541,7 +588,7 @@ paths:
                 'scope':
                   type: string
                   description: "the name of the scope"
-                  
+
   #------------------
   # Session
   #------------------
@@ -2271,7 +2318,9 @@ paths:
                 type: string
               requirements:
                 description: A list of rules to create
-                type: object
+                type: array
+                items:
+                  $ref: '#/definitions/requirement'
               org_resources:
                 description: A mapping between resource name and claim
                 type: object
@@ -2459,6 +2508,43 @@ paths:
       responses:
         '200':
           description: ok
+  '/vms/{uuid}/console':
+    put:
+      tags:
+        - 'vms'
+      summary: executes a single command on the zones console
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              command:
+                description: The command to execute
+                type: string
+              args:
+                description: An array of arguments to pass to the command
+                type: array
+                items:
+                  type: string
+      responses:
+        '200':
+          description: ok
+          schema:
+            type: object
+            properties:
+              exit_code:
+                type: integer
+                description: Exit code of the command executed
+              output:
+                type: string
+                description: Output of the command (stdout,stderr combined)
   '/vms/{uuid}/package':
     put:
       tags:
@@ -2479,6 +2565,10 @@ paths:
               action:
                 description: One of 'start', 'stop' or 'reboot'
                 type: string
+                enum:
+                  - start
+                  - stop
+                  - reboot
       responses:
         '200':
           description: ok
@@ -2557,11 +2647,10 @@ paths:
             type: object
             properties:
               network:
-                description: network of the new nic
-                type: string
+                $ref: '#/definitions/uuid'
       responses:
         '303':
-          description: Redirect to new org
+          description: Redirect to the changed VM
   '/vms/{uuid}/nics/{mac}':
     delete:
       tags:
@@ -2580,7 +2669,34 @@ paths:
           type: string
       responses:
         '200':
-          description: ok
+          description: adds a new nic
+  '/vms/{uuid}/hostname/{nic}':
+    put:
+      tags:
+        - 'vms'
+      summary: Sets the hostname of a nice, setting it empty removes it.
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the vm
+          required: true
+          type: string
+        - name: nic
+          in: path
+          required: true
+          description: name of the nic for wich the hostname shoulld be set
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              hostname:
+                type: string
+      responses:
+        '200':
+          description: sets the hostname
   '/vms/{uuid}/fw_rules':
     post:
       tags:
@@ -2810,11 +2926,23 @@ paths:
             type: object
             properties:
               action:
-                description: needs to be 'rollback'
+                description: |
+                  needs to be 'rollback' or 'restore'. rules and package are
+                  only valid for restore
                 type: string
-              hypervisor:
-                description: Restores a backup to a specifo
-                type: string
+                enum:
+                  - rollback
+                  - restore
+              rules:
+                description: Additional rules for the restore
+                type: array
+                items:
+                  $ref: '#/definitions/requirement'
+              package:
+                $ref: '#/definitions/uuid'
+            required:
+              - action
+              - rules
       responses:
         '200':
           description: ok
