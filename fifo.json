@@ -539,6 +539,15 @@
                 "owner": {
                     "$ref": "#/definitions/uuid"
                 },
+                "hostname_mappings": {
+                    "type": "object"
+                },
+                "iprange_mappings": {
+                    "type": "object"
+                },
+                "network_mappings": {
+                    "type": "object"
+                },
                 "uuid": {
                     "$ref": "#/definitions/uuid"
                 },
@@ -1605,7 +1614,7 @@
                 "tags": [
                     "clients"
                 ],
-                "summary": "Adds an URI to the valid redirect URI’s for this client",
+                "summary": "Adds an URI to the valid redirect URIâ€™s for this client",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -3431,7 +3440,53 @@
                                 },
                                 "config": {
                                     "description": "object with additional",
-                                    "type": "object"
+                                    "type": "object",
+                                    "properties": {
+                                        "hostname": {
+                                            "type": "string"
+                                        },
+                                        "alias": {
+                                            "type": "string"
+                                        },
+                                        "requirements": {
+                                            "description": "Additional requirements",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/requirement"
+                                            }
+                                        },
+                                        "routes": {
+                                            "description": "List of routs, each rout is a object of the with 1 element\nthe network as a key the router as the value.\n",
+                                            "type": "object"
+                                        },
+                                        "resolvers": {
+                                            "description": "List of resolvers",
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "delegate_dataset": {
+                                            "description": "Enable a delegated dataset",
+                                            "type": "boolean"
+                                        },
+                                        "grouping": {
+                                            "description": "Cluster this VM is going to be placed in",
+                                            "type": "string"
+                                        },
+                                        "hostnames": {
+                                            "description": "A object mapping nic (i.e. net0) to a hostname",
+                                            "type": "object"
+                                        },
+                                        "metadata": {
+                                            "description": "Metadata to attatch, needs to be flat",
+                                            "type": "object"
+                                        },
+                                        "networks": {
+                                            "description": "A object mapping nic (i.e. net0) to a netowrk uuids",
+                                            "type": "object"
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -3717,11 +3772,11 @@
                                     "type": "string"
                                 },
                                 "alias": {
-                                    "description": "the vm’s alias",
+                                    "description": "the vmâ€™s alias",
                                     "type": "string"
                                 },
                                 "resolvers": {
-                                    "description": "list of VM’s resolvers",
+                                    "description": "list of VMâ€™s resolvers",
                                     "type": "array",
                                     "items": {
                                         "type": "string"

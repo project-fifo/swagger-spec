@@ -357,6 +357,12 @@ definitions:
         $ref: '#/definitions/uuid'
       owner:
         $ref: '#/definitions/uuid'
+      hostname_mappings:
+        type: object
+      iprange_mappings:
+        type: object
+      network_mappings:
+        type: object
       uuid:
         $ref: '#/definitions/uuid'
       docker:
@@ -2402,6 +2408,41 @@ paths:
               config:
                 description: object with additional
                 type: object
+                properties:
+                  hostname:
+                    type: string
+                  alias:
+                    type: string
+                  requirements:
+                    description: Additional requirements
+                    type: array
+                    items:
+                      $ref: '#/definitions/requirement'
+                  routes:
+                    description: |
+                      List of routs, each rout is a object of the with 1 element
+                      the network as a key the router as the value.
+                    type: object
+                  resolvers:
+                    description: List of resolvers
+                    type: array
+                    items:
+                      type: string
+                  delegate_dataset:
+                    description: Enable a delegated dataset
+                    type: boolean
+                  grouping:
+                    description: Cluster this VM is going to be placed in
+                    type: string
+                  hostnames:
+                    description: A object mapping nic (i.e. net0) to a hostname
+                    type: object
+                  metadata:
+                    description: Metadata to attatch, needs to be flat
+                    type: object
+                  networks:
+                    description: A object mapping nic (i.e. net0) to a netowrk uuids
+                    type: object
       responses:
         '303':
           description: redirect to new org
