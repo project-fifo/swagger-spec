@@ -1050,7 +1050,8 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "Tests if a user has is allowed to perform an action.\nPlease note that 403 here does not mean the user is not allowed\nbut that the requesting token was not allowed to test for the client!\n",
+                "summary": "Test user permission",
+                "description": "Tests if a user has is allowed to perform an action.\nPlease note that 403 here does not mean the user is not allowed\nbut that the requesting token was not allowed to test for the client!\n",
                 "responses": {
                     "200": {
                         "description": "OK"
@@ -1271,7 +1272,8 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "Adds a user to an Organisation. The first joined Organisation\nwill automatically be set as active. Any further Organisations\nneed to be selected as active by passing the 'active' parameter\nin a JSON.\n",
+                "summary": "Adds a user to an Organisation.",
+                "description": "The first joined Organisation\nwill automatically be set as active. Any further Organisations\nneed to be selected as active by passing the 'active' parameter\nin a JSON.\n",
                 "parameters": [
                     {
                         "name": "body",
@@ -1311,7 +1313,8 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "Crates a API token for a user with a given scope, please keep in\nmind that the reply to this request is THE ONLY TIME the bearer\ntoken can be accessed!\n",
+                "summary": "Crates a API token",
+                "description": "Crates a API token for a user with a given scope, please keep in\nmind that the reply to this request is THE ONLY TIME the bearer\ntoken can be accessed!\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1357,7 +1360,8 @@
                 "tags": [
                     "users"
                 ],
-                "summary": "Revokes a token, this applies equally for access and refresh tokens\n",
+                "summary": "Revokes a token.",
+                "description": "This applies equally for access and refresh tokens\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1531,7 +1535,8 @@
                 "tags": [
                     "clients"
                 ],
-                "summary": "Tests if a client has is allowed to perform an action. Please note\nthat 403 here does not mean the client is not allowed but that the\nrequesting token was not allowed to test for the client!\n",
+                "summary": "Tests if a client has is allowed to perform an action.",
+                "description": "Please note that 403 here does not mean the client is not allowed but that the\nrequesting token was not allowed to test for the client!\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -1614,7 +1619,7 @@
                 "tags": [
                     "clients"
                 ],
-                "summary": "Adds an URI to the valid redirect URIâ€™s for this client",
+                "summary": "Adds an URI to the valid redirect URI’s for this client",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -2581,7 +2586,8 @@
                 "tags": [
                     "datasets"
                 ],
-                "summary": "Uploads a manifest as 1st step of a dataset import from a local file\n",
+                "summary": "Upload a manifest",
+                "description": "This is the 1st step of a dataset import from a local file\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -2623,7 +2629,8 @@
                 "tags": [
                     "datasets"
                 ],
-                "summary": "Uploads a zvol as 2nd step of a dataset import from a local file\n",
+                "summary": "Uploads a zvol",
+                "description": "This is the 2nd step of a dataset import from a local file\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -2773,7 +2780,8 @@
                 "tags": [
                     "hypervisors"
                 ],
-                "summary": "deletes a hypervisor. every vm still residing on this hypervisor\nwill either be put in 'limbo' when at least one full backup exists,\nor be deleted if not.\n",
+                "summary": "deletes a hypervisor.",
+                "description": "Every vm still residing on this hypervisor\nwill either be put in 'limbo' when at least one full backup exists,\nor be deleted if not.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -2795,7 +2803,8 @@
                 "tags": [
                     "hypervisors"
                 ],
-                "summary": "sets a hypervisor characteristic, this can be later used on rules\nto match against.\n",
+                "summary": "Sets a hypervisor characteristic.",
+                "description": "this can be later used on rules to match against.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -3079,7 +3088,7 @@
                 "tags": [
                     "networks"
                 ],
-                "summary": "Lists all networks visible to the user.\n",
+                "summary": "Lists all networks visible to the user.",
                 "description": "See 'Get Network' for the fields available for 'full-list-fields'\n",
                 "parameters": [
                     {
@@ -3275,7 +3284,8 @@
                 "tags": [
                     "packages"
                 ],
-                "summary": "Creates a new package\nRequirements\n'requirements' is an array of objects as with the following atributes:\n'WEIGHT'\nA number (positive or negative) or the string \"most\", \"cant\" for strong\nenforcement or \"scale\" and \"random\" must, cant, and <number> rules\nThis rules simply compare an attribute of the hypervisor against a\nvalue and either enforces a the rule (must/cant) or gives out points,\nboth positive and negative to rate the found hypervisors.\nattribute\nThe attribute to check on the hypervisors, this can be a json like\npath so for example \"characteristics.colour\" will look up colour in\nthe hypervisors characteristics\nValue\nThe value to check against, this can be a number, a string, or an array.\ncondition\nOne of:\n>=, > - Checks if the value of attribute is larger (or equal) to the\nvalue\n=<, < - Checks if the value of attribute is smaller (or equal) to the\nvalue\n=:= - Checks if the value of attribute is equal to the value\n=/= - Checks if the value of attribute is not equal to the value\n\"subset\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"superset\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"disjoint\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"element\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"allowed\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\nscale rules\nThis rules linearly map an attributes value onto a given scale and\ngive the result as points for hypervisor selection.\nattribute\nThe attribute to check on the hypervisors, this can be a json like\npath so for example \"characteristics.cores\" will look up cores in the\nhypervisors characteristics This must be an numeric value towork\nlow, and high\nThe lowest and highest number of the scale, to map against.\nrandom ruleS\nThis rules simply generate a random number on a given scale, this\nallows making non deterministic rules. The resulting number is used\nas points for hypervisor selection.\nlow, and high\nThe lowest and highest number the random number is generated from.\n",
+                "summary": "Creates a new package.",
+                "description": "Requirements\n'requirements' is an array of objects as with the following atributes:\n'WEIGHT'\nA number (positive or negative) or the string \"most\", \"cant\" for strong\nenforcement or \"scale\" and \"random\" must, cant, and <number> rules\nThis rules simply compare an attribute of the hypervisor against a\nvalue and either enforces a the rule (must/cant) or gives out points,\nboth positive and negative to rate the found hypervisors.\nattribute\nThe attribute to check on the hypervisors, this can be a json like\npath so for example \"characteristics.colour\" will look up colour in\nthe hypervisors characteristics\nValue\nThe value to check against, this can be a number, a string, or an array.\ncondition\nOne of:\n>=, > - Checks if the value of attribute is larger (or equal) to the\nvalue\n=<, < - Checks if the value of attribute is smaller (or equal) to the\nvalue\n=:= - Checks if the value of attribute is equal to the value\n=/= - Checks if the value of attribute is not equal to the value\n\"subset\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"superset\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"disjoint\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"element\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\n\"allowed\" - Checks if the value of attribute is a subset of value\n(requires value to be an array)\nscale rules\nThis rules linearly map an attributes value onto a given scale and\ngive the result as points for hypervisor selection.\nattribute\nThe attribute to check on the hypervisors, this can be a json like\npath so for example \"characteristics.cores\" will look up cores in the\nhypervisors characteristics This must be an numeric value towork\nlow, and high\nThe lowest and highest number of the scale, to map against.\nrandom ruleS\nThis rules simply generate a random number on a given scale, this\nallows making non deterministic rules. The resulting number is used\nas points for hypervisor selection.\nlow, and high\nThe lowest and highest number the random number is generated from.\n",
                 "parameters": [
                     {
                         "name": "body",
@@ -3421,7 +3431,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "this request queues a new VM creation. Most of the keys in config\nare self-explanatory the one noteworthy is networks however. it is\na map of nics (provided by the dataset) to UUIDs of networks (\nnot ip ranges!).\n",
+                "summary": "Queue a new VM creation.",
+                "description": "Most of the keys in config\nare self-explanatory the one noteworthy is networks however. it is\na map of nics (provided by the dataset) to UUIDs of networks (\nnot ip ranges!).\n",
                 "parameters": [
                     {
                         "name": "body",
@@ -3544,40 +3555,13 @@
                 }
             }
         },
-        "/vms/{uuid}/metrics": {
-            "get": {
-                "tags": [
-                    "vms"
-                ],
-                "summary": "Reads a VM",
-                "parameters": [
-                    {
-                        "name": "uuid",
-                        "in": "path",
-                        "description": "uuid of the hypervisor",
-                        "required": true,
-                        "type": "string"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "returns metrics for the hypervisor",
-                        "schema": {
-                            "$ref": "#/definitions/metrics"
-                        }
-                    },
-                    "503": {
-                        "description": "No metric server."
-                    }
-                }
-            }
-        },
         "/vms/dry_run": {
             "post": {
                 "tags": [
                     "vms"
                 ],
-                "summary": "This is the same as the normal Create an VM request however it stops\nbefore sending the request to the hypervisor. So no VM is ever created\nhowever it does check if the VM could be created.\nIt needs to be noted that both false positives and false negatives\ncan occur so this is a good approximation but should not be taken as\na definite. False positive are more likely then false negatives.\n",
+                "summary": "Dry run VM creation",
+                "description": "This is the same as the normal Create an VM request however it stops\nbefore sending the request to the hypervisor. So no VM is ever created\nhowever it does check if the VM could be created.\nIt needs to be noted that both false positives and false negatives\ncan occur so this is a good approximation but should not be taken as\na definite. False positive are more likely then false negatives.\n",
                 "parameters": [
                     {
                         "name": "body",
@@ -3772,11 +3756,11 @@
                                     "type": "string"
                                 },
                                 "alias": {
-                                    "description": "the vmâ€™s alias",
+                                    "description": "the vm’s alias",
                                     "type": "string"
                                 },
                                 "resolvers": {
-                                    "description": "list of VMâ€™s resolvers",
+                                    "description": "list of VM’s resolvers",
                                     "type": "array",
                                     "items": {
                                         "type": "string"
@@ -4061,7 +4045,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "this will roll back a zfs snapshot and delete all snapshots newer\nthen the snapshot\nPlease note that ZFS snapshots do not allow keeping snapshots newer\nthat a rolled back snapshots so those will be deleted. Please use\nbackups of this is a feature you need\n",
+                "summary": "Roll back ZFS snapshot",
+                "description": "This will roll back a zfs snapshot and delete all snapshots newer\nthen the snapshot.\nPlease note that ZFS snapshots do not allow keeping snapshots newer\nthat a rolled back snapshots so those will be deleted. Please use\nbackups of this is a feature you need\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -4104,7 +4089,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "deletes a Snapshot, newer snapshots will not be affected other then\ntheir size night change\n",
+                "summary": "Deletes a Snapshot.",
+                "description": "Newer snapshots will not be affected other then\ntheir size night change.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -4133,7 +4119,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "Creates a ZFS snapshot and sends it to to LeoFS as a backup. Both\nincremental and full backups can be created. If a incremental backup\nis done the parent must be local.\nIn incremental backup here means that a incremental ZFS send is done\nwith the parent as parent.\nThe following files are created in LeoFS:\n<vm-uuid>/<backup-uuid> - the gzip compressed ZFS snapshot\n<vm-uuid>/<backup-uuid>.xml - the zone config XML file from /etc/zones/<vm-uuid>.xml\n<vm-uuid>/<backup-uuid>.parent - UUID of the parent snapshot if this is a incremental backup.\n",
+                "summary": "Creates a ZFS snapshot stored in LeoFS",
+                "description": "Creates a ZFS snapshot and sends it to to LeoFS. Both\nincremental and full backups can be created. If a incremental backup\nis done the parent must be local.\nIn incremental backup here means that a incremental ZFS send is done\nwith the parent as parent.\nThe following files are created in LeoFS:\n<vm-uuid>/<backup-uuid> - the gzip compressed ZFS snapshot\n<vm-uuid>/<backup-uuid>.xml - the zone config XML file from /etc/zones/<vm-uuid>.xml\n<vm-uuid>/<backup-uuid>.parent - UUID of the parent snapshot if this is a incremental backup.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -4193,7 +4180,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "This will check the sha1 hash of the storeed backup, to do this the\nbackup is internally streamed and a new sha1 is calcualated. Both\nold and new values are then returned.\n",
+                "summary": "Verifies backup integrety.",
+                "description": "This will check the sha1 hash of the storeed backup, to do this the\nbackup is internally streamed and a new sha1 is calcualated. Both\nold and new values are then returned.\n",
                 "responses": {
                     "200": {
                         "description": "The calculation could be performed, please not that this does not mean\nthat the sha sums are matching, just that the calculation could be performed.\n"
@@ -4204,7 +4192,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "This restores a backup in the process the entire zfs volume might be\ndestroyed and re-created, all snapshots will be deleted!\nIf the VM is 'in limbo' so not deployed to a hypervisor right now, it\nis possible to select the hypervisor it is re-deployed to.\n",
+                "summary": "Restore a backup.",
+                "description": "This restores a backup in the process the entire zfs volume might be\ndestroyed and re-created, all snapshots will be deleted!\nIf the VM is 'in limbo' so not deployed to a hypervisor right now, it\nis possible to select the hypervisor it is re-deployed to.\n",
                 "parameters": [
                     {
                         "name": "body",
@@ -4233,8 +4222,7 @@
                                 }
                             },
                             "required": [
-                                "action",
-                                "rules"
+                                "action"
                             ]
                         }
                     }
@@ -4249,7 +4237,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "Deletes a Backup, this will also delete all files on LeoFS related\nto this backup. This will also delete all children of this backup\nsince the restore can no longer happen without the parent. However\nother backups who are not in the child path of this backup will not\nbe affected, not even if they are newer.\n",
+                "summary": "Deletes a Backup",
+                "description": "Deletes a Backup, this will also delete all files on LeoFS related\nto this backup. This will also delete all children of this backup\nsince the restore can no longer happen without the parent. However\nother backups who are not in the child path of this backup will not\nbe affected, not even if they are newer.\n",
                 "responses": {
                     "200": {
                         "description": "ok"
@@ -4262,7 +4251,8 @@
                 "tags": [
                     "vms"
                 ],
-                "summary": "Changes the service state, see man svcadm for more information\n",
+                "summary": "Changes the service state",
+                "description": "See man svcadm for more information.\n",
                 "parameters": [
                     {
                         "name": "uuid",
@@ -4293,6 +4283,34 @@
                 "responses": {
                     "200": {
                         "description": "ok"
+                    }
+                }
+            }
+        },
+        "/vms/{uuid}/metrics": {
+            "get": {
+                "tags": [
+                    "vms"
+                ],
+                "summary": "Reads a VM",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "uuid of the hypervisor",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns metrics for the hypervisor",
+                        "schema": {
+                            "$ref": "#/definitions/metrics"
+                        }
+                    },
+                    "503": {
+                        "description": "No metric server."
                     }
                 }
             }

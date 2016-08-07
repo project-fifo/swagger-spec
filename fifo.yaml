@@ -732,7 +732,8 @@ paths:
     get:
       tags:
         - 'users'
-      summary: |
+      summary: Test user permission
+      description: |
         Tests if a user has is allowed to perform an action.
         Please note that 403 here does not mean the user is not allowed
         but that the requesting token was not allowed to test for the client!
@@ -878,8 +879,9 @@ paths:
     put:
       tags:
         - 'users'
-      summary: |
-        Adds a user to an Organisation. The first joined Organisation
+      summary: Adds a user to an Organisation.
+      description: |
+        The first joined Organisation
         will automatically be set as active. Any further Organisations
         need to be selected as active by passing the 'active' parameter
         in a JSON.
@@ -907,7 +909,8 @@ paths:
     post:
       tags:
         - 'users'
-      summary: |
+      summary: Crates a API token
+      description: |
         Crates a API token for a user with a given scope, please keep in
         mind that the reply to this request is THE ONLY TIME the bearer
         token can be accessed!
@@ -940,8 +943,9 @@ paths:
     delete:
       tags:
         - 'users'
-      summary: |
-        Revokes a token, this applies equally for access and refresh tokens
+      summary: Revokes a token.
+      description: |
+        This applies equally for access and refresh tokens
       parameters:
         - name: uuid
           in: path
@@ -1053,9 +1057,9 @@ paths:
     get:
       tags:
         - 'clients'
-      summary: |
-        Tests if a client has is allowed to perform an action. Please note
-        that 403 here does not mean the client is not allowed but that the
+      summary: Tests if a client has is allowed to perform an action.
+      description: |
+        Please note that 403 here does not mean the client is not allowed but that the
         requesting token was not allowed to test for the client!
       parameters:
         - name: uuid
@@ -1778,8 +1782,9 @@ paths:
     put:
       tags:
         - 'datasets'
-      summary: |
-        Uploads a manifest as 1st step of a dataset import from a local file
+      summary: Upload a manifest
+      description: |
+        This is the 1st step of a dataset import from a local file
       parameters:
         - name: uuid
           in: path
@@ -1806,8 +1811,9 @@ paths:
     put:
       tags:
         - 'datasets'
-      summary: |
-        Uploads a zvol as 2nd step of a dataset import from a local file
+      summary: Uploads a zvol
+      description: |
+        This is the 2nd step of a dataset import from a local file
       parameters:
         - name: uuid
           in: path
@@ -1904,8 +1910,9 @@ paths:
     delete:
       tags:
         - 'hypervisors'
-      summary: |
-        deletes a hypervisor. every vm still residing on this hypervisor
+      summary: deletes a hypervisor.
+      description: |
+        Every vm still residing on this hypervisor
         will either be put in 'limbo' when at least one full backup exists,
         or be deleted if not.
       parameters:
@@ -1921,9 +1928,9 @@ paths:
     put:
       tags:
         - 'hypervisors'
-      summary: |
-        sets a hypervisor characteristic, this can be later used on rules
-        to match against.
+      summary: Sets a hypervisor characteristic.
+      description: |
+        this can be later used on rules to match against.
       parameters:
         - name: uuid
           in: path
@@ -2112,8 +2119,7 @@ paths:
     get:
       tags:
         - 'networks'
-      summary: |
-        Lists all networks visible to the user.
+      summary: Lists all networks visible to the user.
       description: |
         See 'Get Network' for the fields available for 'full-list-fields'
       parameters:
@@ -2236,8 +2242,8 @@ paths:
     post:
       tags:
         - 'packages'
-      summary: |
-        Creates a new package
+      summary: Creates a new package.
+      description: |
         Requirements
         'requirements' is an array of objects as with the following atributes:
         'WEIGHT'
@@ -2387,8 +2393,9 @@ paths:
     post:
       tags:
         - 'vms'
-      summary: |
-        this request queues a new VM creation. Most of the keys in config
+      summary: Queue a new VM creation.
+      description: |
+        Most of the keys in config
         are self-explanatory the one noteworthy is networks however. it is
         a map of nics (provided by the dataset) to UUIDs of networks (
         not ip ranges!).
@@ -2475,27 +2482,12 @@ paths:
       responses:
         '200':
           description: ok
-  '/vms/{uuid}/metrics':
-    get:
-      tags:
-        - 'vms'
-      summary: reads a vm
-      parameters:
-        - name: uuid
-          in: path
-          description: uuid of the vm
-          required: true
-          type: string
-      responses:
-        '200':
-          description: returns an vms
-          schema:
-            $ref: '#/definitions/vm'
   '/vms/dry_run':
     post:
       tags:
         - 'vms'
-      summary: |
+      summary: Dry run VM creation
+      description: |
         This is the same as the normal Create an VM request however it stops
         before sending the request to the hypervisor. So no VM is ever created
         however it does check if the VM could be created.
@@ -2835,9 +2827,10 @@ paths:
     put:
       tags:
         - 'vms'
-      summary: |
-        this will roll back a zfs snapshot and delete all snapshots newer
-        then the snapshot
+      summary: Roll back ZFS snapshot
+      description: |
+        This will roll back a zfs snapshot and delete all snapshots newer
+        then the snapshot.
         Please note that ZFS snapshots do not allow keeping snapshots newer
         that a rolled back snapshots so those will be deleted. Please use
         backups of this is a feature you need
@@ -2868,9 +2861,10 @@ paths:
     delete:
       tags:
         - 'vms'
-      summary: |
-        deletes a Snapshot, newer snapshots will not be affected other then
-        their size night change
+      summary: Deletes a Snapshot.
+      description: |
+        Newer snapshots will not be affected other then
+        their size night change.
       parameters:
         - name: uuid
           in: path
@@ -2889,8 +2883,9 @@ paths:
     post:
       tags:
         - 'vms'
-      summary: |
-        Creates a ZFS snapshot and sends it to to LeoFS as a backup. Both
+      summary: Creates a ZFS snapshot stored in LeoFS
+      description: |
+        Creates a ZFS snapshot and sends it to to LeoFS. Both
         incremental and full backups can be created. If a incremental backup
         is done the parent must be local.
         In incremental backup here means that a incremental ZFS send is done
@@ -2942,7 +2937,8 @@ paths:
     get:
       tags:
         - 'vms'
-      summary: |
+      summary: Verifies backup integrety.
+      description: |
         This will check the sha1 hash of the storeed backup, to do this the
         backup is internally streamed and a new sha1 is calcualated. Both
         old and new values are then returned.
@@ -2954,7 +2950,8 @@ paths:
     put:
       tags:
         - 'vms'
-      summary: |
+      summary: Restore a backup.
+      description: |
         This restores a backup in the process the entire zfs volume might be
         destroyed and re-created, all snapshots will be deleted!
         If the VM is 'in limbo' so not deployed to a hypervisor right now, it
@@ -2983,14 +2980,14 @@ paths:
                 $ref: '#/definitions/uuid'
             required:
               - action
-              - rules
       responses:
         '200':
           description: ok
     delete:
       tags:
         - 'vms'
-      summary: |
+      summary: Deletes a Backup
+      description: |
         Deletes a Backup, this will also delete all files on LeoFS related
         to this backup. This will also delete all children of this backup
         since the restore can no longer happen without the parent. However
@@ -3003,8 +3000,9 @@ paths:
     put:
       tags:
         - 'vms'
-      summary: |
-        Changes the service state, see man svcadm for more information
+      summary: Changes the service state
+      description: |
+        See man svcadm for more information.
       parameters:
         - name: uuid
           in: path

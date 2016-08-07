@@ -511,9 +511,9 @@ paths:
       tags:
         - 'vms'
       summary: |
-        This restores a backup in the process the entire zfs volume might be 
+        This restores a backup in the process the entire zfs volume might be
         destroyed and re-created, all snapshots will be deleted!
-        If the VM is 'in limbo' so not deployed to a hypervisor right now, it 
+        If the VM is 'in limbo' so not deployed to a hypervisor right now, it
         is possible to select the hypervisor it is re-deployed to.
       parameters:
         - name: body
@@ -525,8 +525,11 @@ paths:
               action:
                 description: needs to be 'rollback'
                 type: string
-              hypervisor:
+              rules:
                 description: Restores a backup to a specifo
+                type: array
+              package:
+                description: Package to restore with
                 type: string
       responses:
         '200':
@@ -534,7 +537,7 @@ paths:
     delete:
       tags:
         - 'vms'
-      summary: | 
+      summary: |
         Deletes a Backup, this will also delete all files on LeoFS related
         to this backup. This will also delete all children of this backup 
         since the restore can no longer happen without the parent. However 
