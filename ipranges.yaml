@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/ipranges
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 2.0.0
-  title: Project-FiFo
+  version: 3.0.0
+  title: IP-Ranges
 parameters:
   fulllistParam:
     name: full-list
@@ -30,30 +30,6 @@ definitions:
   uuid:
     type: string
     pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-  permission:
-    type: array
-    items:
-      type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
   iprange:
     properties:
       metadata:
@@ -78,18 +54,12 @@ definitions:
           type: string
       uuid:
         $ref: '#/definitions/uuid'
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
 paths:
-  '/ipranges':
+    #------------------
+  # IPRanges
+  #------------------
+  '/':
     get:
-      tags:
-        - 'ipranges'
       summary: Lists all IP Ranges visible to the user
       description: |
         See Get IP Range for the fields available for 'full-list-fields'
@@ -106,8 +76,6 @@ paths:
                 - $ref: '#/definitions/iprange'
                 - $ref: '#/definitions/uuid'
     post:
-      tags:
-        - 'ipranges'
       summary: Creates a new ip range
       parameters:
         - name: body
@@ -122,7 +90,7 @@ paths:
               tag:
                 description: NIC Tag for the IP Range to use
                 type: string
-              subnet: 
+              subnet:
                 description: The network address of the subnet
                 type: string
               netmask:
@@ -137,16 +105,14 @@ paths:
               last:
                 description: Last address to hand out (must be part of subnet!)
                 type: string
-              vlan: 
+              vlan:
                 description: VLan to tag the nics with
                 type: integer
       responses:
         '303':
           description: Redirect to new org
-  '/ipranges/{uuid}':
+  '/{uuid}':
     get:
-      tags:
-        - 'ipranges'
       summary: Reads a IP Range
       parameters:
         - name: uuid
@@ -160,8 +126,6 @@ paths:
           schema:
             $ref: '#/definitions/iprange'
     put:
-      tags:
-        - 'ipranges'
       summary: Claims an IP Address from the range
       parameters:
         - name: uuid
@@ -172,10 +136,8 @@ paths:
       responses:
         '200':
           description: OK
-  '/ipranges/{uuid}/{ip}':
+  '/{uuid}/{ip}':
     put:
-      tags:
-        - 'ipranges'
       summary: Releases an IP
       parameters:
         - name: uuid
