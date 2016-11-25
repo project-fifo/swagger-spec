@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/roles
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 2.0.0
-  title: Project-FiFo
+  version: 3.0.0
+  title: Roles
 parameters:
   fulllistParam:
     name: full-list
@@ -34,26 +34,6 @@ definitions:
     type: array
     items:
       type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
   role:
     properties:
       metadata:
@@ -66,18 +46,12 @@ definitions:
           $ref: '#/definitions/permission'
       uuid:
         $ref: '#/definitions/uuid'
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
 paths:
-  '/roles':
+  #------------------
+  # Roles
+  #------------------
+  '/':
     get:
-      tags:
-        - 'roles'
       summary: Lists all roles visible to the user
       description: |
         See Get Roles for the fields available for 'full-list-fields'
@@ -94,8 +68,6 @@ paths:
                 - $ref: '#/definitions/role'
                 - $ref: '#/definitions/uuid'
     post:
-      tags:
-        - 'roles'
       summary: Creates a new role
       parameters:
         - name: body
@@ -115,10 +87,8 @@ paths:
       responses:
         '303':
           description: Redirect to new client
-  '/roles/{uuid}':
+  '/{uuid}':
     get:
-      tags:
-        - 'roles'
       summary: Reads a role
       parameters:
         - name: uuid
@@ -132,8 +102,6 @@ paths:
           schema:
             $ref: '#/definitions/role'
     delete:
-      tags:
-        - 'roles'
       summary: Deletes a role
       parameters:
         - name: uuid
@@ -144,10 +112,8 @@ paths:
       responses:
         '200':
           description: OK
-  '/roles/{uuid}/permissions/{permission}':
+  '/{uuid}/permissions/{permission}':
     put:
-      tags:
-        - 'roles'
       summary: Grants a permission to a role.
       parameters:
         - name: uuid
@@ -165,8 +131,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'roles'
       summary: Revokes a permission from a role
       parameters:
         - name: uuid

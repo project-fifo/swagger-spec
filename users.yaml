@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/3
+basePath: /api/3/users
 consumes:
   - application/json
 produces:
   - application/json
 info:
   version: 3.0.0
-  title: Project-FiFo
+  title: Users
 
 ###################
 # PARAMETERS
@@ -38,75 +38,10 @@ definitions:
   uuid:
     type: string
     pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-  metrics:
-    type: object
-    properties:
-      '<key>':
-        type: array
-        items:
-          type: integer
   permission:
     type: array
     items:
       type: string
-  requirement:
-    allOf:
-      - type: object
-        properties:
-          weight:
-            type: string
-            enum:
-              - 'scale'
-          attribute:
-            type: string
-          low:
-            type: integer
-          high:
-            type: integer
-      - type: object
-        properties:
-          weight:
-            type: string
-            enum:
-              - 'random'
-          low:
-            type: integer
-          high:
-            type: integer
-      - type: object
-        properties:
-          attribute:
-            type: string
-          condition:
-            type: string
-            enum:
-              - '>='
-              - '=<'
-              - '>'
-              - '<'
-              - '=:='
-              - '=/='
-              - 'superset'
-              - 'subset'
-              - 'disjoint'
-              - 'element'
-          value:
-            allOf:
-              - type: string
-              - type: integer
-              - type: array
-                items:
-                  type: integer
-              - type: array
-                items:
-                  type: string
-          weight:
-            allOf:
-              - type: string
-                enum:
-                  - must
-                  - cant
-              - type: integer
   apikey:
     properties:
       bearer:
@@ -133,16 +68,6 @@ definitions:
       - type
       - scope
       - id
-  cdr:
-    properties:
-      action:
-        type: string
-      metadata:
-        type: object
-      resource:
-        $ref: '#/definitions/uuid'
-      timestamp:
-        type: integer
   user:
     properties:
       keys:
@@ -175,256 +100,6 @@ definitions:
         type: array
         items:
           type: string
-  client:
-    properties:
-      client_id:
-        type: string
-      metadata:
-        type: object
-      name:
-        type: string
-      redirect_uris: # TODO: THIS IS NOT CORRECT
-        type: array
-        items:
-          type: string
-      permissions:
-        type: array
-        items:
-          $ref: '#/definitions/permission'
-      roles:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      type:
-        type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  role:
-    properties:
-      metadata:
-        type: object
-      name:
-        type: string
-      permissions:
-        type: array
-        items:
-          $ref: '#/definitions/permission'
-      uuid:
-        $ref: '#/definitions/uuid'
-  org:
-    properties:
-      metadata:
-        type: object
-      name:
-        type: string
-      triggers:
-        type: array
-        items:
-          type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  grouping:
-    properties:
-      config:
-        type: object
-      metadata:
-        type: object
-      elements:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      name:
-        type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-      type:
-        type: string
-        enum:
-          - stack
-          - cluster
-  dataset:
-    properties:
-      metadata:
-        type: object
-      description:
-        type: string
-      image_size:
-        type: integer
-      imported:
-        type: integer
-      name:
-        type: string
-      networks:
-        type: array
-        items:
-          type: object
-      os:
-        type: string
-      requirements:
-        type: array
-        items:
-          $ref: '#/definitions/requirement'
-      status:
-        type: string
-      type:
-        type: string
-      version:
-        type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  hypervisor:
-    properties:
-      alias:
-        type: string
-      metadata:
-        type: object
-      characteristics:
-        type: object
-      etherstubs:
-        type: object
-      host:
-        type: string
-      networks:
-        type: array
-        items:
-          type: string
-      path:
-        type: array
-        items:
-          type: string
-      pools:
-        type: object
-      port:
-        type: integer
-      resources:
-        type: object
-      services:
-        type: object
-      sysinfo:
-        type: object
-      version:
-        type: string
-      virtualisation:
-        type: array
-        items:
-          type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  vm:
-    type: object
-    properties:
-      alias:
-        type: string
-      backups:
-        type: object
-        properties:
-          comment:
-            type: string
-          files:
-            type: object
-            properties:
-              '<file>':
-                type: object
-                properties:
-                  sha1:
-                    type: string
-                  size:
-                    type: integer
-          local:
-            type: boolean
-          local_size:
-            type: integer
-          pending:
-            type: boolean
-          state:
-            type: string
-            enum:
-              - completed
-              - pending
-          xml:
-            type: boolean
-      config:
-        type: object
-      created_at:
-        type: integer
-      created_by:
-        $ref: '#/definitions/uuid'
-      dataset:
-        $ref: '#/definitions/uuid'
-      hypervisor:
-        $ref: '#/definitions/uuid'
-      package:
-        $ref: '#/definitions/uuid'
-      owner:
-        $ref: '#/definitions/uuid'
-      hostname_mappings:
-        type: object
-      iprange_mappings:
-        type: object
-      network_mappings:
-        type: object
-      uuid:
-        $ref: '#/definitions/uuid'
-      docker:
-        type: object
-  iprange:
-    properties:
-      metadata:
-        type: object
-      name:
-        type: string
-      gateway:
-        type: string
-      netmask:
-        type: string
-      network:
-        type: string
-      tag:
-        type: string
-      free:
-        type: array
-        items:
-          type: string
-      used:
-        type: array
-        items:
-          type: string
-      uuid:
-        $ref: '#/definitions/uuid'
-  network:
-    properties:
-      metadata:
-        type: object
-      name:
-        type: string
-      ipranges:
-        type: array
-        items:
-          $ref: '#/definitions/uuid'
-      uuid:
-        $ref: '#/definitions/uuid'
-  package:
-    properties:
-      metadata:
-        type: object
-      name:
-        type: string
-      compression:
-        type: string
-      cpu_cap:
-        type: integer
-      quota:
-        type: integer
-      ram:
-        type: integer
-      org_resources:
-        type: object
-      requirements:
-        type: array
-        items:
-          $ref: '#/definitions/requirement'
-      uuid:
-        $ref: '#/definitions/uuid'
 ###################
 # Path definitions
 ###################
@@ -432,10 +107,8 @@ paths:
   #------------------
   # Users
   #------------------
-  '/users':
+  '/':
     get:
-      tags:
-        - 'users'
       summary: Lists all users visible to the user
       description: |
         See Get User for the fields available for full-list-fields.
@@ -452,8 +125,6 @@ paths:
                 - $ref: '#/definitions/user'
                 - $ref: '#/definitions/uuid'
     post:
-      tags:
-        - 'users'
       summary: Creates a new user
       description: |
         Creates a new user
@@ -468,8 +139,6 @@ paths:
         required: true
         type: string
     get:
-      tags:
-        - 'users'
       summary: Reads a user
       responses:
         '200':
@@ -477,8 +146,6 @@ paths:
           schema:
             $ref: '#/definitions/user'
     put:
-      tags:
-        - 'users'
       summary: Changes the password of a user
       parameters:
         - name: body
@@ -496,8 +163,6 @@ paths:
           schema:
             $ref: '#/definitions/user'
     delete:
-      tags:
-        - 'users'
       summary: Deletes a user
       responses:
         '200':
@@ -516,9 +181,8 @@ paths:
         required: true
         type: string
     get:
-      tags:
-        - 'users'
-      summary: |
+      summary: Test user permission
+      description: |
         Tests if a user has is allowed to perform an action.
         Please note that 403 here does not mean the user is not allowed
         but that the requesting token was not allowed to test for the client!
@@ -526,15 +190,11 @@ paths:
         '200':
           description: OK
     put:
-      tags:
-        - 'users'
       summary: Grants a permission to a user
       responses:
         '200':
           description: OK
     delete:
-      tags:
-        - 'users'
       summary: Revokes a permission from a user
       responses:
         '200':
@@ -552,23 +212,17 @@ paths:
         required: true
         type: string
     put:
-      tags:
-        - 'users'
       summary: Gives a user a role
       responses:
         '200':
           description: OK
     delete:
-      tags:
-        - 'users'
       summary: Removes a role from a user
       responses:
         '200':
           description: OK
-  '/users/{uuid}/keys' :
+  '/{uuid}/keys' :
     put:
-      tags:
-        - 'users'
       summary: Adds a SSH key to a user
       parameters:
         - name: uuid
@@ -588,10 +242,8 @@ paths:
       responses:
         '200':
           description: OK
-  '/users/{uuid}/keys/{key-id}' :
+  '/{uuid}/keys/{key-id}' :
     delete:
-      tags:
-        - 'users'
       summary: Removes a SSH key from a user
       parameters:
         - name: uuid
@@ -607,10 +259,8 @@ paths:
       responses:
         '200':
           description: OK
-  '/users/{uuid}/yubikeys' :
+  '/{uuid}/yubikeys' :
     put:
-      tags:
-        - 'users'
       summary: Removes a SSH key from a user
       parameters:
         - name: uuid
@@ -630,10 +280,8 @@ paths:
       responses:
         '200':
           description: OK
-  '/users/{uuid}/yubikeys/{key-id}' :
+  '/{uuid}/yubikeys/{key-id}' :
     delete:
-      tags:
-        - 'users'
       summary: Removes a SSH key from a user
       parameters:
         - name: uuid
@@ -649,7 +297,7 @@ paths:
       responses:
         '200':
           description: OK
-  '/users/{uuid}/orgs/{org}':
+  '/{uuid}/orgs/{org}':
     parameters:
       - name: uuid
         in: path
@@ -662,10 +310,9 @@ paths:
         required: true
         type: string
     put:
-      tags:
-        - 'users'
-      summary: |
-        Adds a user to an Organisation. The first joined Organisation
+      summary: Adds a user to an Organisation.
+      description: |
+        The first joined Organisation
         will automatically be set as active. Any further Organisations
         need to be selected as active by passing the 'active' parameter
         in a JSON.
@@ -683,17 +330,14 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'users'
       summary: Removes user from an organization
       responses:
         '200':
           description: OK
-  '/users/{uuid}/tokens':
+  '/{uuid}/tokens':
     post:
-      tags:
-        - 'users'
-      summary: |
+      summary: Crates a API token
+      description: |
         Crates a API token for a user with a given scope, please keep in
         mind that the reply to this request is THE ONLY TIME the bearer
         token can be accessed!
@@ -722,12 +366,11 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apikey'
-  '/users/{uuid}/tokens/{token-id}' :
+  '/{uuid}/tokens/{token-id}' :
     delete:
-      tags:
-        - 'users'
-      summary: |
-        Revokes a token, this applies equally for access and refresh tokens
+      summary: Revokes a token.
+      description: |
+        This applies equally for access and refresh tokens
       parameters:
         - name: uuid
           in: path
