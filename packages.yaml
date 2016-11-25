@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/packages
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 2.0.0
-  title: Project-FiFo
+  version: 3.0.0
+  title: Packages
 parameters:
   fulllistParam:
     name: full-list
@@ -29,31 +29,65 @@ parameters:
 definitions:
   uuid:
     type: string
-    pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-  permission:
-    type: array
-    items:
-      type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
+    pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+  requirement:
+    allOf:
+      - type: object
+        properties:
+          weight:
+            type: string
+            enum:
+              - 'scale'
+          attribute:
+            type: string
+          low:
+            type: integer
+          high:
+            type: integer
+      - type: object
+        properties:
+          weight:
+            type: string
+            enum:
+              - 'random'
+          low:
+            type: integer
+          high:
+            type: integer
+      - type: object
+        properties:
+          attribute:
+            type: string
+          condition:
+            type: string
+            enum:
+              - '>='
+              - '=<'
+              - '>'
+              - '<'
+              - '=:='
+              - '=/='
+              - 'superset'
+              - 'subset'
+              - 'disjoint'
+              - 'element'
+          value:
+            allOf:
+              - type: string
+              - type: integer
+              - type: array
+                items:
+                  type: integer
+              - type: array
+                items:
+                  type: string
+          weight:
+            allOf:
+              - type: string
+                enum:
+                  - must
+                  - cant
+              - type: integer
   package:
     properties:
       metadata:
@@ -68,29 +102,20 @@ definitions:
         type: integer
       ram:
         type: integer
+      org_resources:
+        type: object
       requirements:
         type: array
         items:
-          $ref: '#/definitions/pkg_reqs'
+          $ref: '#/definitions/requirement'
       uuid:
         $ref: '#/definitions/uuid'
-  pkg_reqs:
-    properties:
-      uuid:
-        $ref: '#/definitions/uuid'
-     #TODO: This is not defined
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
 paths:
-  '/packages':
+  #------------------
+  # Packages
+  #------------------
+  '/':
     get:
-      tags:
-        - 'packages'
       summary: Lists all Packages visible to the user
       description: |
         See Get Package for the fields available for full-list-fields.
@@ -104,58 +129,55 @@ paths:
             type: array
             items:
               allOf:
-                - $ref: '#/definitions/packages'
+                - $ref: '#/definitions/package'
                 - $ref: '#/definitions/uuid'
-  '/packages':
     post:
-      tags:
-        - 'packages'
-      summary: |
-        Creates a new package
+      summary: Creates a new package.
+      description: |
         Requirements
         'requirements' is an array of objects as with the following atributes:
         'WEIGHT'
         A number (positive or negative) or the string "most", "cant" for strong
         enforcement or "scale" and "random" must, cant, and <number> rules
-        This rules simply compare an attribute of the hypervisor against a 
-        value and either enforces a the rule (must/cant) or gives out points, 
+        This rules simply compare an attribute of the hypervisor against a
+        value and either enforces a the rule (must/cant) or gives out points,
         both positive and negative to rate the found hypervisors.
         attribute
-        The attribute to check on the hypervisors, this can be a json like 
-        path so for example "characteristics.colour" will look up colour in 
+        The attribute to check on the hypervisors, this can be a json like
+        path so for example "characteristics.colour" will look up colour in
         the hypervisors characteristics
         Value
         The value to check against, this can be a number, a string, or an array.
         condition
         One of:
-        >=, > - Checks if the value of attribute is larger (or equal) to the 
+        >=, > - Checks if the value of attribute is larger (or equal) to the
         value
-        =<, < - Checks if the value of attribute is smaller (or equal) to the 
+        =<, < - Checks if the value of attribute is smaller (or equal) to the
         value
         =:= - Checks if the value of attribute is equal to the value
         =/= - Checks if the value of attribute is not equal to the value
-        "subset" - Checks if the value of attribute is a subset of value 
+        "subset" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "superset" - Checks if the value of attribute is a subset of value 
+        "superset" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "disjoint" - Checks if the value of attribute is a subset of value 
+        "disjoint" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "element" - Checks if the value of attribute is a subset of value 
+        "element" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
-        "allowed" - Checks if the value of attribute is a subset of value 
+        "allowed" - Checks if the value of attribute is a subset of value
         (requires value to be an array)
         scale rules
-        This rules linearly map an attributes value onto a given scale and 
+        This rules linearly map an attributes value onto a given scale and
         give the result as points for hypervisor selection.
         attribute
-        The attribute to check on the hypervisors, this can be a json like 
-        path so for example "characteristics.cores" will look up cores in the 
+        The attribute to check on the hypervisors, this can be a json like
+        path so for example "characteristics.cores" will look up cores in the
         hypervisors characteristics This must be an numeric value towork
         low, and high
         The lowest and highest number of the scale, to map against.
         random ruleS
-        This rules simply generate a random number on a given scale, this 
-        allows making non deterministic rules. The resulting number is used 
+        This rules simply generate a random number on a given scale, this
+        allows making non deterministic rules. The resulting number is used
         as points for hypervisor selection.
         low, and high
         The lowest and highest number the random number is generated from.
@@ -165,13 +187,13 @@ paths:
           required: true
           schema:
             type: object
-            properties: 
-              name: 
+            properties:
+              name:
                 description: Name of the package
                 type: string
               quota:
                 description: |
-                  'GB' of quota to give the package, for KVM this applies as 
+                  'GB' of quota to give the package, for KVM this applies as
                   secondary disk
                 type: integer
               ram:
@@ -182,12 +204,12 @@ paths:
                 type: integer
               cpu_shares:
                 description: |
-                  Shares of CPU time when two zones compete. (Defaults to 
+                  Shares of CPU time when two zones compete. (Defaults to
                   % of memory)
                 type: string
               zfs_io_priority:
                 description: |
-                  ZFS Priority if zones are competing. (Defaults to % of 
+                  ZFS Priority if zones are competing. (Defaults to % of
                   memory)
                 type: integer
               blicksize:
@@ -198,14 +220,17 @@ paths:
                 type: string
               requirements:
                 description: A list of rules to create
+                type: array
+                items:
+                  $ref: '#/definitions/requirement'
+              org_resources:
+                description: A mapping between resource name and claim
                 type: object
       responses:
         '200':
           description: ok
-  '/packages/{uuid}':
+  '/{uuid}':
     get:
-      tags:
-        - 'packages'
       summary: Reads a Package
       parameters:
         - name: uuid
@@ -218,10 +243,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/package'
-  '/packages/{uuid}':
     delete:
-      tags:
-        - 'packages'
       summary: Deletes a Package
       parameters:
         - name: uuid
