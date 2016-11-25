@@ -34,26 +34,6 @@ definitions:
     type: array
     items:
       type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
   client:
     properties:
       client_id:
@@ -78,16 +58,11 @@ definitions:
         type: string
       uuid:
         $ref: '#/definitions/uuid'
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
+paths:
   #------------------
   # Clients
   #------------------
-  '':
+  '/':
     get:
       tags:
         - 'clients'
