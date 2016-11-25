@@ -76,8 +76,6 @@ paths:
   #------------------
   '/':
     get:
-      tags:
-        - 'datasets'
       summary: Lists all Datasets visible to the user
       description: |
         See Get Dataset for the fields available for 'full-list-fields'
@@ -94,8 +92,6 @@ paths:
                 - $ref: '#/definitions/dataset'
                 - $ref: '#/definitions/uuid'
     post:
-      tags:
-        - 'datasets'
       summary: Imports a dataset form a imgapi compatible server
       parameters:
         - name: body
@@ -112,8 +108,6 @@ paths:
           description: Redirect to new org
   '/{uuid}':
     get:
-      tags:
-        - 'datasets'
       summary: Reads a Dataset
       parameters:
         - name: uuid
@@ -127,8 +121,6 @@ paths:
           schema:
             $ref: '#/definitions/dataset'
     delete:
-      tags:
-        - 'datasets'
       summary: Reads a Dataset
       parameters:
         - name: uuid
@@ -140,8 +132,6 @@ paths:
         '200':
           description: OK
     put:
-      tags:
-        - 'datasets'
       summary: Upload a manifest
       description: |
         This is the 1st step of a dataset import from a local file
@@ -156,8 +146,6 @@ paths:
           description: Redirect to new org
   '/{uuid}/dataset.gz':
     get:
-      tags:
-        - 'datasets'
       summary: Downloads a zVol
       parameters:
         - name: uuid
@@ -169,8 +157,6 @@ paths:
         '200':
           description: OK
     put:
-      tags:
-        - 'datasets'
       summary: Uploads a zvol
       description: |
         This is the 2nd step of a dataset import from a local file
@@ -185,8 +171,6 @@ paths:
           description: Redirect to new org
   '/{uuid}/networks/{nic}':
     put:
-      tags:
-        - 'datasets'
       summary: Adds or modifies a nic on the dataset
       parameters:
         - name: uuid
@@ -212,8 +196,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'datasets'
       summary: Adds or modifies a nic on the dataset
       parameters:
         - name: uuid

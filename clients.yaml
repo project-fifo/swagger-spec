@@ -64,8 +64,6 @@ paths:
   #------------------
   '/':
     get:
-      tags:
-        - 'clients'
       summary: Lists all clients visible to the user.
       description: |
         See Get Client for the fields available for 'full-list-fields'
@@ -82,8 +80,6 @@ paths:
                 - $ref: '#/definitions/client'
                 - $ref: '#/definitions/uuid'
     post:
-      tags:
-        - 'clients'
       summary: Creates a new client
       parameters:
         - name: body
@@ -103,8 +99,6 @@ paths:
           description: Redirect to new client
   '/{uuid}':
     get:
-      tags:
-        - 'clients'
       summary: Reads a client
       parameters:
         - name: uuid
@@ -118,8 +112,6 @@ paths:
           schema:
             $ref: '#/definitions/client'
     put:
-      tags:
-        - 'clients'
       summary: Changes the 'secret' of a client
       parameters:
         - name: uuid
@@ -140,8 +132,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'clients'
       summary: Deletes a Client
       parameters:
         - name: uuid
@@ -154,8 +144,6 @@ paths:
           description: OK
   '/{uuid}/permissions/{permission}':
     get:
-      tags:
-        - 'clients'
       summary: Tests if a client has is allowed to perform an action.
       description: |
         Please note that 403 here does not mean the client is not allowed but that the
@@ -176,8 +164,6 @@ paths:
         '200':
           description: OK
     put:
-      tags:
-        - 'clients'
       summary: Grants a permission> to a client
       parameters:
         - name: uuid
@@ -195,8 +181,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'clients'
       summary: Revokes a permission to a client
       parameters:
         - name: uuid
@@ -215,8 +199,6 @@ paths:
           description: OK
   '/{uuid}/uris':
     post:
-      tags:
-        - 'clients'
       summary: Adds an URI to the valid redirect URI’s for this client
       parameters:
         - name: uuid
@@ -238,8 +220,6 @@ paths:
           description: OK
   '/{uuid}/uris/{id}':
     delete:
-      tags:
-        - 'clients'
       summary: Deletes key with given uuid for client with given uuid
       parameters:
         - name: uuid

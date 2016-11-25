@@ -81,8 +81,6 @@ paths:
   #------------------
   '/':
     get:
-      tags:
-        - 'hypervisors'
       summary: lists all hypervisors visible to the user
       description: |
         See 'get hypervisor' for the fields available for 'full-list-fields'
@@ -100,8 +98,6 @@ paths:
                 - $ref: '#/definitions/uuid'
   '/{uuid}':
     get:
-      tags:
-        - 'hypervisors'
       summary: reads a hypervisor
       parameters:
         - name: uuid
@@ -115,8 +111,6 @@ paths:
           schema:
             $ref: '#/definitions/hypervisor'
     delete:
-      tags:
-        - 'hypervisors'
       summary: deletes a hypervisor.
       description: |
         Every vm still residing on this hypervisor
@@ -133,8 +127,6 @@ paths:
           description: ok
   '/{uuid}/characteristics/{path}':
     put:
-      tags:
-        - 'hypervisors'
       summary: Sets a hypervisor characteristic.
       description: |
         this can be later used on rules to match against.
@@ -153,8 +145,6 @@ paths:
         '200':
           description: ok
     delete:
-      tags:
-        - 'hypervisors'
       summary: removes a characteristic from a hypervisor
       parameters:
         - name: uuid
@@ -172,8 +162,6 @@ paths:
           description: ok
   '/{uuid}/config':
     put:
-      tags:
-        - 'hypervisors'
       summary: sets a configuration / alias of the hypervisor
       parameters:
         - name: uuid
@@ -195,8 +183,6 @@ paths:
           description: ok
   '/{uuid}/metrics':
     get:
-      tags:
-        - 'hypervisors'
       summary: Reads a VM
       parameters:
         - name: uuid
