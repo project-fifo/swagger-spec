@@ -89,20 +89,20 @@ paths:
           schema:
             $ref: '#/definitions/grouping'
   '/{uuid}/elements/{other}':
-    parameters:
-      - name: uuid
-        in: path
-        description: uuid of the grouping to modify
-        required: true
-        type: string
-      - name: other
-        in: path
-        description: uuid of the grouping to add
-        required: true
-        type: string
     put:
       tags:
         - 'groupings'
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: other
+          in: path
+          description: uuid of the grouping to add
+          required: true
+          type: string
       summary: add an element to the grouping
       responses:
         '200':
@@ -110,27 +110,37 @@ paths:
     delete:
       tags:
         - 'groupings'
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: other
+          in: path
+          description: uuid of the grouping to add
+          required: true
+          type: string
       summary: remove an vm from the grouping
       responses:
         '200':
           description: OK
   '/{uuid}/config/{path}':
-    parameters:
-      - name: uuid
-        in: path
-        description: uuid of the grouping to modify
-        required: true
-        type: string
-      - name: path
-        in: path
-        description: path of the configuration key
-        required: true
-        type: string
     put:
       tags:
         - 'groupings'
       summary: Sets configuration value for a grouping
       parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: path of the configuration key
+          required: true
+          type: string
         - name: body
           in: body
           required: true
@@ -142,27 +152,37 @@ paths:
     delete:
       tags:
         - 'groupings'
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: path of the configuration key
+          required: true
+          type: string
       summary: Removes grouping configuration
       responses:
         '200':
           description: OK
   '/{uuid}/metadata/{path}':
-    parameters:
-      - name: uuid
-        in: path
-        description: uuid of the grouping to modify
-        required: true
-        type: string
-      - name: path
-        in: path
-        description: path of the metadata key
-        required: true
-        type: string
     put:
       tags:
         - 'groupings'
       summary: Sets metadata value for a grouping
       parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: path of the metadata key
+          required: true
+          type: string
         - name: body
           in: body
           required: true
@@ -174,6 +194,17 @@ paths:
     delete:
       tags:
         - 'groupings'
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the grouping to modify
+          required: true
+          type: string
+        - name: path
+          in: path
+          description: path of the metadata key
+          required: true
+          type: string
       summary: Removes grouping metadata
       responses:
         '200':
