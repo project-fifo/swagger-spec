@@ -132,14 +132,14 @@ paths:
         303:
           description: Redirect to new user
   '/user/{uuid}':
-    parameters:
-      - name: uuid
-        in: path
-        description: uuid of the user
-        required: true
-        type: string
     get:
       summary: Reads a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
       responses:
         '200':
           description: returns a grouping
@@ -148,6 +148,11 @@ paths:
     put:
       summary: Changes the password of a user
       parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
         - name: body
           in: body
           required: true
@@ -164,24 +169,39 @@ paths:
             $ref: '#/definitions/user'
     delete:
       summary: Deletes a user
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+            properties:
+              password:
+                description: new password to set
+                type: string
       responses:
         '200':
           description: OK
   '/user/{uuid}/permissions/{permission}':
-    parameters:
-      - name: uuid
-        in: path
-        description: UUID of the user
-        required: true
-        type: string
-      - name: permission
-        in: path
-        description: |
-          the permission to grant as path i.e. 'some/funky/permission'
-        required: true
-        type: string
     get:
       summary: Test user permission
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to grant as path i.e. 'some/funky/permission'
+          required: true
+          type: string
       description: |
         Tests if a user has is allowed to perform an action.
         Please note that 403 here does not mean the user is not allowed
@@ -191,33 +211,68 @@ paths:
           description: OK
     put:
       summary: Grants a permission to a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to grant as path i.e. 'some/funky/permission'
+          required: true
+          type: string
       responses:
         '200':
           description: OK
     delete:
       summary: Revokes a permission from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: permission
+          in: path
+          description: |
+            the permission to grant as path i.e. 'some/funky/permission'
+          required: true
+          type: string
       responses:
         '200':
           description: OK
   '/user/{uuid}/role/{role}':
-    parameters:
-      - name: uuid
-        in: path
-        description: UUID of the user
-        required: true
-        type: string
-      - name: role
-        in: path
-        description: UUID of the role to join
-        required: true
-        type: string
     put:
       summary: Gives a user a role
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: role
+          in: path
+          description: UUID of the role to join
+          required: true
+          type: string
       responses:
         '200':
           description: OK
     delete:
       summary: Removes a role from a user
+      parameters:
+        - name: uuid
+          in: path
+          description: UUID of the user
+          required: true
+          type: string
+        - name: role
+          in: path
+          description: UUID of the role to join
+          required: true
+          type: string
       responses:
         '200':
           description: OK
@@ -298,17 +353,6 @@ paths:
         '200':
           description: OK
   '/{uuid}/orgs/{org}':
-    parameters:
-      - name: uuid
-        in: path
-        description: uuid of the user
-        required: true
-        type: string
-      - name: org
-        in: path
-        description: UUID of the org to join
-        required: true
-        type: string
     put:
       summary: Adds a user to an Organisation.
       description: |
@@ -317,6 +361,16 @@ paths:
         need to be selected as active by passing the 'active' parameter
         in a JSON.
       parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: org
+          in: path
+          description: UUID of the org to join
+          required: true
+          type: string
         - name: body
           in: body
           required: false
@@ -331,6 +385,17 @@ paths:
           description: OK
     delete:
       summary: Removes user from an organization
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the user
+          required: true
+          type: string
+        - name: org
+          in: path
+          description: UUID of the org to join
+          required: true
+          type: string
       responses:
         '200':
           description: OK
