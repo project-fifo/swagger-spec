@@ -55,8 +55,6 @@ paths:
   #------------------
   '/':
     get:
-      tags:
-        - 'groupings'
       summary: list groupings
       description: |
         Lists all `Groupings` visible to the user, either by uuid or objects.
@@ -74,8 +72,6 @@ paths:
                 - type: string
   '/{uuid}':
     get:
-      tags:
-        - 'groupings'
       summary: read grouping
       parameters:
         - name: uuid
@@ -90,8 +86,6 @@ paths:
             $ref: '#/definitions/grouping'
   '/{uuid}/elements/{other}':
     put:
-      tags:
-        - 'groupings'
       parameters:
         - name: uuid
           in: path
@@ -108,8 +102,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'groupings'
       parameters:
         - name: uuid
           in: path
@@ -127,8 +119,6 @@ paths:
           description: OK
   '/{uuid}/config/{path}':
     put:
-      tags:
-        - 'groupings'
       summary: Sets configuration value for a grouping
       parameters:
         - name: uuid
@@ -150,8 +140,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'groupings'
       parameters:
         - name: uuid
           in: path
@@ -169,8 +157,6 @@ paths:
           description: OK
   '/{uuid}/metadata/{path}':
     put:
-      tags:
-        - 'groupings'
       summary: Sets metadata value for a grouping
       parameters:
         - name: uuid
@@ -192,8 +178,6 @@ paths:
         '200':
           description: OK
     delete:
-      tags:
-        - 'groupings'
       parameters:
         - name: uuid
           in: path
