@@ -1,0 +1,119 @@
+
+swagger: '2.0'
+basePath: /api/3/sessions
+consumes:
+  - application/json
+produces:
+  - application/json
+info:
+  version: 3.0.0
+  title: Sessions
+
+###################
+# DEFINITIONS
+###################
+definitions:
+  uuid:
+    type: string
+    pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+  permission:
+    type: array
+    items:
+      type: string
+  token:
+    properties:
+      client:
+        $ref: '#/definitions/uuid'
+      expiery:
+        type: integer
+      scope:
+        type: array
+        items:
+          type: string
+      type:
+        enum:
+          - 'refresh'
+          - 'access'
+      id:
+        $ref: '#/definitions/uuid'
+    required:
+      - type
+      - scope
+      - id
+  user:
+    properties:
+      keys:
+        type: object
+      metadata:
+        type: object
+      name:
+        type: string
+      org:
+        $ref: '#/definitions/uuid'
+      orgs:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      permissions:
+        type: array
+        items:
+          $ref: '#/definitions/permission'
+      roles:
+        type: array
+        items:
+          $ref: '#/definitions/uuid'
+      tokens:
+        type: array
+        items:
+          $ref: '#/definitions/token'
+      uuid:
+        $ref: '#/definitions/uuid'
+      yubikeys:
+        type: array
+        items:
+          type: string
+###################
+# Path definitions
+###################
+paths:
+  #------------------
+  # Session
+  #------------------
+  '/':
+    delete:
+      summary: deletes a token
+      responses:
+        204:
+          description: ok
+    get:
+      tags:
+        - sessions
+        - users
+      summary: retrieves information about the current session
+      responses:
+        200:
+          description: the logged in user
+          schema:
+            $ref: '#/definitions/user'
+
+  '/one_time_token':
+    get:
+      summary: creates a one time toke
+      description: |
+        FiFo uses one time tokens to secure web socket, that way
+        the token can be passed as a query parameter without securty
+        concerns since it will be only valid for a single use. One time
+        tokens have a very short lifetime and will be invalidated after
+        the first use.
+      responses:
+        200:
+          description: the token and experiey
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                description: the token
+              expiery:
+                type: integer
+                description: lifetime of the token in seconds
