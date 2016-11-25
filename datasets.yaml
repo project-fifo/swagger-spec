@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/datasets
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 2.0.0
-  title: Project-FiFo
+  version: 3.0.0
+  title: Datasets
 parameters:
   fulllistParam:
     name: full-list
@@ -30,30 +30,6 @@ definitions:
   uuid:
     type: string
     pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-  permission:
-    type: array
-    items:
-      type: string
-  token:
-    properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
-        type: array
-        items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
   dataset:
     properties:
       metadata:
@@ -69,7 +45,7 @@ definitions:
       networks:
         type: array
         items:
-          $ref: '#/definitions/network'
+          $ref: '#/definitions/uuid'
       os:
         type: string
       requirements:
@@ -94,16 +70,11 @@ definitions:
         type: string
       weight:
         type: string
-
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
 paths:
-  '/datasets':
+  #------------------
+  # Datasets
+  #------------------
+  '/':
     get:
       tags:
         - 'datasets'
@@ -139,7 +110,7 @@ paths:
       responses:
         '303':
           description: Redirect to new org
-  '/datasets/{uuid}':
+  '/{uuid}':
     get:
       tags:
         - 'datasets'
@@ -171,8 +142,9 @@ paths:
     put:
       tags:
         - 'datasets'
-      summary: |
-        Uploads a manifest as 1st step of a dataset import from a local file
+      summary: Upload a manifest
+      description: |
+        This is the 1st step of a dataset import from a local file
       parameters:
         - name: uuid
           in: path
@@ -182,7 +154,7 @@ paths:
       responses:
         '303':
           description: Redirect to new org
-  '/datasets/{uuid}/dataset.gz':
+  '/{uuid}/dataset.gz':
     get:
       tags:
         - 'datasets'
@@ -199,8 +171,9 @@ paths:
     put:
       tags:
         - 'datasets'
-      summary: |
-        Uploads a zvol as 2nd step of a dataset import from a local file
+      summary: Uploads a zvol
+      description: |
+        This is the 2nd step of a dataset import from a local file
       parameters:
         - name: uuid
           in: path
@@ -210,7 +183,7 @@ paths:
       responses:
         '303':
           description: Redirect to new org
-  '/datasets/{uuid}/networks/{nic}':
+  '/{uuid}/networks/{nic}':
     put:
       tags:
         - 'datasets'

@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/groupings
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 0.6.2
-  title: Project-FiFo
+  version: 3.0.0
+  title: Groupings
 parameters:
   fulllistParam:
     name: full-list
@@ -50,8 +50,13 @@ definitions:
           - stack
           - cluster
 paths:
-  /groupings:
+  #------------------
+  # Groupings
+  #------------------
+  '/':
     get:
+      tags:
+        - 'groupings'
       summary: list groupings
       description: |
         Lists all `Groupings` visible to the user, either by uuid or objects.
@@ -67,8 +72,10 @@ paths:
               allOf:
                 - $ref: '#/definitions/grouping'
                 - type: string
-  '/groupings/{uuid}':
+  '/{uuid}':
     get:
+      tags:
+        - 'groupings'
       summary: read grouping
       parameters:
         - name: uuid
@@ -81,37 +88,93 @@ paths:
           description: returns a grouping
           schema:
             $ref: '#/definitions/grouping'
-  '/groupings/{uuid}/elements/{to-add}':
+  '/{uuid}/elements/{other}':
+    parameters:
+      - name: uuid
+        in: path
+        description: uuid of the grouping to modify
+        required: true
+        type: string
+      - name: other
+        in: path
+        description: uuid of the grouping to add
+        required: true
+        type: string
     put:
+      tags:
+        - 'groupings'
       summary: add an element to the grouping
-      parameters:
-        - name: uuid
-          in: path
-          description: uuid of the grouping to modify
-          required: true
-          type: string
-        - name: to-add
-          in: path
-          description: uuid of the grouping to add
-          required: true
-          type: string
       responses:
         '200':
           description: OK
     delete:
+      tags:
+        - 'groupings'
       summary: remove an vm from the grouping
-      parameters:
-        - name: uuid
-          in: path
-          description: uuid of the grouping to modify
-          required: true
-          type: string
-        - name: to-add
-          in: path
-          description: uuid of the grouping to delete
-          required: true
-          type: string
       responses:
         '200':
           description: OK
-
+  '/{uuid}/config/{path}':
+    parameters:
+      - name: uuid
+        in: path
+        description: uuid of the grouping to modify
+        required: true
+        type: string
+      - name: path
+        in: path
+        description: path of the configuration key
+        required: true
+        type: string
+    put:
+      tags:
+        - 'groupings'
+      summary: Sets configuration value for a grouping
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'groupings'
+      summary: Removes grouping configuration
+      responses:
+        '200':
+          description: OK
+  '/{uuid}/metadata/{path}':
+    parameters:
+      - name: uuid
+        in: path
+        description: uuid of the grouping to modify
+        required: true
+        type: string
+      - name: path
+        in: path
+        description: path of the metadata key
+        required: true
+        type: string
+    put:
+      tags:
+        - 'groupings'
+      summary: Sets metadata value for a grouping
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - 'groupings'
+      summary: Removes grouping metadata
+      responses:
+        '200':
+          description: OK'

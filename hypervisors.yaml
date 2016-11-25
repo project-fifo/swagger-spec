@@ -1,12 +1,12 @@
 swagger: '2.0'
-basePath: /api/2
+basePath: /api/3/hypervisors
 consumes:
   - applicaiton/json
 produces:
   - applicaiton/json
 info:
-  version: 2.0.0
-  title: Project-FiFo
+  version: 3.0.0
+  title: Hypervisors
 parameters:
   fulllistParam:
     name: full-list
@@ -30,30 +30,13 @@ definitions:
   uuid:
     type: string
     pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-  permission:
-    type: array
-    items:
-      type: string
-  token:
+  metrics:
+    type: object
     properties:
-      client:
-        $ref: '#/definitions/uuid'
-      expiery:
-        type: integer
-      scope:
+      '<key>':
         type: array
         items:
-          type: string
-      type:
-        enum:
-          - 'refresh'
-          - 'access'
-      id:
-        $ref: '#/definitions/uuid'
-    required:
-      - type
-      - scope
-      - id
+          type: integer
   hypervisor:
     properties:
       alias:
@@ -92,15 +75,11 @@ definitions:
           type: string
       uuid:
         $ref: '#/definitions/uuid'
-  apikey:
-    properties:
-      bearer: 
-        type: string
-      id:
-        $ref: '#/definitions/uuid'
-
 paths:
-  '/hypervisors':
+  #------------------
+  # Hypervisors
+  #------------------
+  '/':
     get:
       tags:
         - 'hypervisors'
@@ -119,7 +98,7 @@ paths:
               allOf:
                 - $ref: '#/definitions/hypervisor'
                 - $ref: '#/definitions/uuid'
-  '/hypervisors/{uuid}':
+  '/{uuid}':
     get:
       tags:
         - 'hypervisors'
@@ -138,9 +117,10 @@ paths:
     delete:
       tags:
         - 'hypervisors'
-      summary: |
-        deletes a hypervisor. every vm still residing on this hypervisor 
-        will either be put in 'limbo' when at least one full backup exists, 
+      summary: deletes a hypervisor.
+      description: |
+        Every vm still residing on this hypervisor
+        will either be put in 'limbo' when at least one full backup exists,
         or be deleted if not.
       parameters:
         - name: uuid
@@ -151,13 +131,13 @@ paths:
       responses:
         '200':
           description: ok
-  '/hypervisors/{uuid}/characteristics/{path}':
+  '/{uuid}/characteristics/{path}':
     put:
       tags:
         - 'hypervisors'
-      summary: |
-        sets a hypervisor characteristic, this can be later used on rules 
-        to match against.
+      summary: Sets a hypervisor characteristic.
+      description: |
+        this can be later used on rules to match against.
       parameters:
         - name: uuid
           in: path
@@ -190,7 +170,7 @@ paths:
       responses:
         '200':
           description: ok
-  '/hypervisors/{uuid}/config':
+  '/{uuid}/config':
     put:
       tags:
         - 'hypervisors'
@@ -213,3 +193,21 @@ paths:
       responses:
         '200':
           description: ok
+  '/{uuid}/metrics':
+    get:
+      tags:
+        - 'hypervisors'
+      summary: Reads a VM
+      parameters:
+        - name: uuid
+          in: path
+          description: uuid of the hypervisor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: returns metrics for the hypervisor
+          schema:
+            $ref: '#/definitions/metrics'
+        '503':
+          description: No metric server.
